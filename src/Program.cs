@@ -14,7 +14,7 @@ class Entry
         Application.Start();
     }
 
-    public static Program program, prog2;
+    public static ShaderProgram program, prog2;
     public static VertexArray Vao, Vao2;
     public static Transform transform = new Transform();
     public static Camera camera = new Camera(new Transform(),60f);
@@ -99,7 +99,7 @@ class Entry
 
         Shader vert = new Shader("vertex/projection.vert");
         Shader frag = new Shader("fragment/simple.frag");
-        program = new Program([vert, frag]);
+        program = new ShaderProgram([vert, frag]);
     }
 
     public static void Render(double delta)

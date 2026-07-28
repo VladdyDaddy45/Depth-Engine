@@ -72,22 +72,22 @@ public enum Uniform
 }
 
 // Class for shader programs
-public class Program
+public class ShaderProgram
 {
     private static GL gl = Video.gl;
-    private static List<Program> Objects = new List<Program>();
+    private static List<ShaderProgram> Objects = new List<ShaderProgram>();
 
     public uint program;
     public bool linked = false;
 
-    public Program() 
+    public ShaderProgram() 
     {
         program = gl.CreateProgram();
         Objects.Add(this);
     }
 
     // Will attach every shader provided in the array
-    public Program(Shader[] shaders)
+    public ShaderProgram(Shader[] shaders)
     {
         program = gl.CreateProgram();
         foreach (Shader shader in shaders)
@@ -170,7 +170,7 @@ public class Program
 
     public static void Cleanup()
     {
-        foreach (Program prog in Objects)
+        foreach (ShaderProgram prog in Objects)
             prog.Kill(true);
     }
 }
