@@ -5,7 +5,7 @@ using Silk.NET.Windowing;
 using Silk.NET.OpenGL;
 
 using Engine.Graphics;
-using Engine.Game;
+using Engine.User;
 
 namespace Engine.Graphics;
 

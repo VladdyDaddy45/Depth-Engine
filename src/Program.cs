@@ -2,6 +2,7 @@
 using Utils.CMath;
 using Engine.Graphics.Shaders;
 using System.Numerics;
+using Silk.NET.Input;
 
 class Entry
 {
@@ -16,7 +17,10 @@ class Entry
     public static ShaderProgram program, prog2;
     public static VertexArray Vao, Vao2;
     public static Transform transform = new Transform();
-    public static Camera camera = new Camera(new Transform(),60f);
+    public static Camera camera = new Camera(new Transform(),90f);
+    public static Vector2 rot = new Vector2(0f,0f);
+    public static bool leftdown = false;
+    public static bool rightdown = false;
 
     public static void Load()
     {   
@@ -104,6 +108,12 @@ class Entry
         Shader vert = new Shader("vertex/projection.vert");
         Shader frag = new Shader("fragment/simple.frag");
         program = new ShaderProgram([vert, frag]);
+
+        for (int i = 0; i < Application.MainApp.input.Keyboards.Count; i++)
+        {
+            Application.MainApp.input.Keyboards[i].KeyDown += keydown;
+            Application.MainApp.input.Keyboards[i].KeyUp += keyup;
+        }
     }
 
     public static void Render(double delta)
@@ -112,8 +122,17 @@ class Entry
         double T = Application.MainApp.window.Time;
         float t = (float)T;
         transform.Scale = 0.5f;
-        transform.Rotation += new Vector3(0.03f, 0f, 0f);
+        //transform.Rotation += new Vector3(0.03f, 0.03f, 0f);
         camera.transform.Position = new Vector3(0f,0f,-2f);
+        //camera.transform.Rotation += new Vector3(0.05f,0f,0.0f);
+
+        rot.X = 0;
+        rot.Y = 0;
+
+        rot.X += leftdown? 0.05f : 0;
+        rot.X += rightdown? -0.05f : 0;
+
+        camera.transform.Rotation += new Vector3(rot.X,rot.Y,0f);
 
         program.Uniform("transform",transform.world);
         program.Uniform("proj",camera.proj);
@@ -129,5 +148,21 @@ class Entry
 
         program.Uniform("transform",trans2.world);
         Vao2.Draw();
+    }
+
+    public static void keydown(IKeyboard keyboard, Key key, int keyCode)
+    {
+        if (key == Key.Left)
+            leftdown = true;
+        if (key == Key.Right)
+            rightdown = true;
+    }
+
+    public static void keyup(IKeyboard keyboard, Key key, int keyCode)
+    {
+        if (key == Key.Left)
+            leftdown = false;
+        if (key == Key.Right)
+            rightdown = false;
     }
 }

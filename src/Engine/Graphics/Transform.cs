@@ -1,18 +1,29 @@
 using System.Numerics;
+using Silk.NET.Maths;
+
 namespace Engine.Graphics;
 
 public struct Transform
 {
     public Transform() {}
 
-    public Vector3 Position {get; set;} = new Vector3(0,0,0);
-    public Vector3 Rotation {get; set;} = new Vector3(0,0,0);
+    public Vector3 Position {get; set;} = new Vector3(0f,0f,0f);
+    public Vector3 Rotation {get; set;} = new Vector3(0f,0f,0f);
 
     public float Scale {get; set;} = 1f;
 
     // Allows for idk man im tired and dont wanna write this comment
     public Quaternion Orientation => Quaternion.Identity * 
         Quaternion.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
+    
+    private Matrix3X3<float> rotmat => Matrix3X3.CreateFromYawPitchRoll<float>(
+            Rotation.X, 
+            Rotation.Y, 
+            Rotation.Z
+    );
+
+    public Vector3 Forward => (Vector3)( new Vector3D<float>(0f,0f,1f) * rotmat );
+    public Vector3 Up => (Vector3)( new Vector3D<float>(0f,1f,0f) * rotmat );
 
     public Matrix4x4 world => 
         Matrix4x4.Identity * 
