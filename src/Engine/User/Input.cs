@@ -1,4 +1,4 @@
-namespace Engine.Game;
+namespace Engine.User;
 
 using System.Diagnostics.CodeAnalysis;
 using Engine.Graphics;

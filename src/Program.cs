@@ -1,7 +1,6 @@
 ﻿using Engine.Graphics;
 using Utils.CMath;
 using Engine.Graphics.Shaders;
-using Engine.Game;
 using System.Numerics;
 
 class Entry
@@ -78,6 +77,11 @@ class Entry
         Vao.SetAttribute(0, 3, VertAttribType.Float);
         Vao.SetAttribute(1, 3, VertAttribType.Float);
         
+        Mesh3D mesh = new Mesh3D(Vao);
+        var inst = mesh.NewInstance();
+
+        mesh.Draw();
+
         float[] tri =
         {
             -1.0f,  1.0f, 0.0f,     1.0f, 0.0f, 0.0f, // top left
@@ -108,7 +112,7 @@ class Entry
         double T = Application.MainApp.window.Time;
         float t = (float)T;
         transform.Scale = 0.5f;
-        transform.Rotation *= Quaternion.CreateFromAxisAngle(new Vector3(0f,1f,0f),0.03f);
+        transform.Rotation += new Vector3(0.03f, 0f, 0f);
         camera.transform.Position = new Vector3(0f,0f,-2f);
 
         program.Uniform("transform",transform.world);
@@ -117,9 +121,11 @@ class Entry
 
         Vao.Draw();
 
-        Transform trans2 = new Transform();
-        trans2.Rotation *= Quaternion.CreateFromAxisAngle(new Vector3(1f,0f,0f),CMath.rad(90));
-        trans2.Position = new Vector3(0f,-.25f, 0f);
+        Transform trans2 = new Transform
+        {
+            Rotation = new Vector3(0f, CMath.rad(90), 0f),
+            Position = new Vector3(0f, -.25f, 0f)
+        };
 
         program.Uniform("transform",trans2.world);
         Vao2.Draw();
