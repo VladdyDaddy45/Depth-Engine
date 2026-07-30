@@ -16,13 +16,18 @@ public struct Transform
     public Quaternion Orientation => Quaternion.Identity * 
         Quaternion.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
     
+    // rotation matrix for calculating forward and up vectors.
     private Matrix3X3<float> rotmat => Matrix3X3.CreateFromYawPitchRoll<float>(
-            Rotation.X, 
-            Rotation.Y, 
-            Rotation.Z
+        Rotation.X, 
+        Rotation.Y, 
+        Rotation.Z
     );
 
-    public Vector3 Forward => (Vector3)( new Vector3D<float>(0f,0f,1f) * rotmat );
+    public Vector3 Forward => Vector3.Normalize(new Vector3(
+        MathF.Cos(Rotation.X) * MathF.Cos(Rotation.Y),
+        MathF.Sin(Rotation.Y),
+        MathF.Sin(Rotation.X) * MathF.Cos(Rotation.Y))
+    );
     public Vector3 Up => (Vector3)( new Vector3D<float>(0f,1f,0f) * rotmat );
 
     public Matrix4x4 world => 

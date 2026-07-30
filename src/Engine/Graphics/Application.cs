@@ -3,9 +3,12 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using Silk.NET.OpenGL;
+using Silk.NET.GLFW;
 
 using Engine.Graphics;
 using Engine.User;
+using Engine.Graphics.Shaders;
+using Silk.NET.Windowing.Glfw;
 
 namespace Engine.Graphics;
 
@@ -19,18 +22,20 @@ public class Application
     
     [NotNull]
     public IWindow window;
+    public WindowOptions options;
     [NotNull]
     public IInputContext input;
 
     public static void Init(int Width, int Height)
     {
         MainApp = new Application(Width, Height);
-
+        
     }
 
     public static void Start()
     {
         MainApp.window.Run();
+        MainApp.window.Dispose();
     }
 
     private Application(int Width, int Height)
@@ -38,7 +43,7 @@ public class Application
         width = Width;
         height = Height;
 
-        WindowOptions options = WindowOptions.Default with
+        options = WindowOptions.Default with
         {
             Size = new Vector2D<int>(width, height),
             Title = "Engine Testing"
@@ -49,6 +54,7 @@ public class Application
         window.Load += Load;
         window.Update += Update;
         window.Render += Render;
+        window.FramebufferResize += FramebufferResize;
         window.Closing += Close;
     }
 
@@ -69,7 +75,16 @@ public class Application
     {}
 
     private void Close()
-    {}
+    {
+        ShaderProgram.Cleanup();
+    }
+
+    private void FramebufferResize(Vector2D<int> newSize)
+    {
+        width = newSize.X;
+        height = newSize.Y;
+        Video.gl.Viewport(newSize);
+    }
 
     private void KeyDown(IKeyboard keyboard, Key key, int keyCode)
     {
@@ -79,6 +94,7 @@ public class Application
 
     public IInputContext getInputContext()
     { return input; }
+
 
     public void AddLoad(Action method)
     { window.Load += method; }
