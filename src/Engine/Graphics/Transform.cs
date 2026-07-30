@@ -1,4 +1,5 @@
 using System.Numerics;
+using Utils.CMath;
 using Silk.NET.Maths;
 
 namespace Engine.Graphics;
@@ -23,12 +24,25 @@ public struct Transform
         Rotation.Z
     );
 
+    /*
+     precomputation less expensive. 
+     need less power. save on electricity. 
+     take wife to dinner with money you saved. 
+     life good.
+    */
+
     public Vector3 Forward => Vector3.Normalize(new Vector3(
         MathF.Cos(Rotation.X) * MathF.Cos(Rotation.Y),
         MathF.Sin(Rotation.Y),
         MathF.Sin(Rotation.X) * MathF.Cos(Rotation.Y))
     );
-    public Vector3 Up => (Vector3)( new Vector3D<float>(0f,1f,0f) * rotmat );
+    
+    public Vector3 Right => Vector3.Normalize(new Vector3(
+            MathF.Cos(Rotation.X),
+            0f,
+            -MathF.Sin(Rotation.X)
+        )
+    );
 
     public Matrix4x4 world => 
         Matrix4x4.Identity * 
