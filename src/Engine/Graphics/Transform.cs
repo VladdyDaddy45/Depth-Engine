@@ -16,37 +16,26 @@ public struct Transform
     // Allows for idk man im tired and dont wanna write this comment
     public Quaternion Orientation => Quaternion.Identity * 
         Quaternion.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
-    
-    // rotation matrix for calculating forward and up vectors.
-    private Matrix3X3<float> rotmat => Matrix3X3.CreateFromYawPitchRoll<float>(
+
+    private Matrix4x4 RotationMatrix => Matrix4x4.CreateFromYawPitchRoll(
         Rotation.X, 
         Rotation.Y, 
         Rotation.Z
     );
 
-    /*
-     precomputation less expensive. 
-     need less power. save on electricity. 
-     take wife to dinner with money you saved. 
-     life good.
-    */
-
-    public Vector3 Forward => Vector3.Normalize(new Vector3(
-        MathF.Cos(Rotation.X) * MathF.Cos(Rotation.Y),
-        MathF.Sin(Rotation.Y),
-        MathF.Sin(Rotation.X) * MathF.Cos(Rotation.Y))
-    );
-    
-    public Vector3 Right => Vector3.Normalize(new Vector3(
-            MathF.Cos(Rotation.X),
-            0f,
-            -MathF.Sin(Rotation.X)
-        )
-    );
+    public Vector3 Forward => Vector3.Transform(Vector3.UnitZ, RotationMatrix);
+    public Vector3 Right => Vector3.Transform(Vector3.UnitX, RotationMatrix);
+    public Vector3 Up => Vector3.Transform(Vector3.UnitY, RotationMatrix);
 
     public Matrix4x4 world => 
         Matrix4x4.Identity * 
         Matrix4x4.CreateFromQuaternion(Orientation) *
         Matrix4x4.CreateScale(Scale) *
         Matrix4x4.CreateTranslation(Position);
+
+    public void Lerp(Transform Target, float Amount)
+    {
+        Position = Vector3.Lerp(Position, Target.Position, Amount);
+        Rotation = Vector3.Lerp(Rotation, Target.Rotation, Amount);
+    }
 }

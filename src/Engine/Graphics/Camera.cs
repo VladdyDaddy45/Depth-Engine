@@ -14,7 +14,7 @@ public class Camera
     public float fov;
 
     
-    public Matrix4x4 view => Matrix4x4.CreateLookAt(transform.Position, transform.Position + transform.Forward, new Vector3(0f,1f,0f));
+    public Matrix4x4 view => Matrix4x4.CreateLookAt(transform.Position, transform.Position + transform.Forward, transform.Up);
     public Matrix4x4 proj => Matrix4x4.CreatePerspectiveFieldOfView(CMath.rad(fov), aspect_ratio, 0.1f, 1000.0f);
 
     public Camera(Transform Trans, float FOV)

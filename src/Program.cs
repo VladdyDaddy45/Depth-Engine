@@ -1,8 +1,8 @@
 ﻿using Engine.Graphics;
-using Utils.CMath;
 using Engine.Graphics.Shaders;
+using Engine.User;
+using Utils.CMath;
 using System.Numerics;
-using Silk.NET.Input;
 
 class Entry
 {
@@ -18,9 +18,10 @@ class Entry
     public static VertexArray Vao, Vao2;
     public static Transform transform = new Transform();
     public static Camera camera = new Camera(new Transform(),60f);
-    public static Vector2 rot = new Vector2(0f,0f);
     public static bool leftdown = false;
     public static bool rightdown = false;
+    private static float movespeed = 0.1f;
+    private static Key testkey = Key.L;
 
     public static void Load()
     {   
@@ -109,11 +110,7 @@ class Entry
         Shader frag = new Shader("fragment/simple.frag");
         program = new ShaderProgram([vert, frag]);
 
-        for (int i = 0; i < Application.MainApp.input.Keyboards.Count; i++)
-        {
-            Application.MainApp.input.Keyboards[i].KeyDown += keydown;
-            Application.MainApp.input.Keyboards[i].KeyUp += keyup;
-        }
+        //Input.AddDownCallback(testkey, testinputthing);
     }
 
     public static void Render(double delta)
@@ -121,17 +118,28 @@ class Entry
         program.Use();
         double T = Application.MainApp.window.Time;
         float t = (float)T;
-        transform.Scale = 0.5f;
+        transform.Scale = 0.25f;
         transform.Rotation += new Vector3(0.03f, 0.03f, 0f);
-        camera.transform.Position = new Vector3(0f,0f,-2f);
-        //camera.transform.Rotation += new Vector3(0.05f,0f,0.0f);
 
-        rot.X = 0;
-        rot.Y = 0;
+        float move = 0;
 
-        rot.X += leftdown? -0.05f : 0;
-        rot.X += rightdown? 0.05f : 0;
 
+        Vector2 rot = new Vector2();
+
+        rot.X += Input.GetKey(Key.Left)? 0.02f : 0;
+        rot.X += Input.GetKey(Key.Right)? -0.02f : 0;
+
+        bool u, d;
+        u = Input.GetKey(Key.Up);
+        d = Input.GetKey(Key.Down);
+
+        Console.WriteLine(u);
+
+        if (u) {move+=movespeed;}
+        if (d) {move-=movespeed;}
+        
+
+        camera.transform.Position += camera.transform.Forward * move;
         camera.transform.Rotation += new Vector3(rot.X,rot.Y,0f);
 
         program.Uniform("transform",transform.world);
@@ -149,20 +157,10 @@ class Entry
         program.Uniform("transform",trans2.world);
         Vao2.Draw();
     }
-
-    public static void keydown(IKeyboard keyboard, Key key, int keyCode)
+    
+    private static void testinputthing()
     {
-        if (key == Key.Left)
-            leftdown = true;
-        if (key == Key.Right)
-            rightdown = true;
-    }
-
-    public static void keyup(IKeyboard keyboard, Key key, int keyCode)
-    {
-        if (key == Key.Left)
-            leftdown = false;
-        if (key == Key.Right)
-            rightdown = false;
+        Console.WriteLine("activated");
+        Input.RemoveDownCallback(testkey,testinputthing);
     }
 }

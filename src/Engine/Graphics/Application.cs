@@ -63,6 +63,7 @@ public class Application
         input = window.CreateInput();
 
         Video.Init(MainApp);
+        Input.Init();
 
         for (int i = 0; i < input.Keyboards.Count; i++)
             input.Keyboards[i].KeyDown += KeyDown;
