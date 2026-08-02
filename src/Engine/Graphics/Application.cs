@@ -108,4 +108,9 @@ public class Application
 
     public void AddClosing(Action method)
     { window.Closing += method; }
+
+    ~Application()
+    {
+        Close();
+    }
 }

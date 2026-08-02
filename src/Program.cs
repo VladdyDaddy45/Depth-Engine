@@ -110,7 +110,7 @@ class Entry
         Shader frag = new Shader("fragment/simple.frag");
         program = new ShaderProgram([vert, frag]);
 
-        //Input.AddDownCallback(testkey, testinputthing);
+        Input.AddDownCallback(testkey, testinputthing);
     }
 
     public static void Render(double delta)
@@ -132,8 +132,6 @@ class Entry
         bool u, d;
         u = Input.GetKey(Key.Up);
         d = Input.GetKey(Key.Down);
-
-        Console.WriteLine(u);
 
         if (u) {move+=movespeed;}
         if (d) {move-=movespeed;}

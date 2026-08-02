@@ -33,24 +33,24 @@ public class Input
 
         Length++;
         Buttons = new bool[Length];
+        KeyDownEvents = new List<Action>[Length];
+        KeyUpEvents = new List<Action>[Length];
 
         foreach(Key key in values)
         {
-            if ((int)key == -1)
+            int idx = (int)key;
+
+            if (idx == -1)
                 continue;
 
-            Buttons[(int)key] = false;
+            Buttons[idx] = false;
+            KeyDownEvents[idx] = new List<Action>();
+            KeyUpEvents[idx] = new List<Action>();
         }
-        
-
-        KeyDownEvents = new List<Action>[Length];
-        KeyUpEvents = new List<Action>[Length];
     }
 
     public static bool GetKey(Key key)
-    {
-        return Buttons[(int)key];
-    }
+    { return Buttons[(int)key]; }
 
     public static void AddDownCallback(Key key, Action cb)
     { KeyDownEvents[(int)key].Add(cb); }
@@ -67,15 +67,17 @@ public class Input
 
     private static void KeyDown(IKeyboard keyboard, Key key, int code)
     {
-        Buttons[(int)key] = true;
-        //foreach(Action cb in KeyDownEvents[(int)key])
-        //    cb();
+        int idx = (int)key;
+        Buttons[idx] = true;
+        for (int i = 0; i < KeyDownEvents[idx].Count; i++)
+            KeyDownEvents[idx][i]();
     }
     
     private static void KeyUp(IKeyboard keyboard, Key key, int code)
     {
-        Buttons[(int)key] = false;
-        //foreach(Action cb in KeyUpEvents[(int)key])
-        //    cb();
+        int idx = (int)key;
+        Buttons[idx] = false;
+        for (int i = 0; i < KeyUpEvents[idx].Count; i++)
+            KeyUpEvents[idx][i]();
     }
 }
