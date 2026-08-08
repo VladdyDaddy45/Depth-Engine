@@ -3,8 +3,9 @@ using Engine.Graphics.Shaders;
 using Engine.User;
 using Utils.CMath;
 using System.Numerics;
+using static System.Console;
 
-class Entry
+unsafe class Entry
 {
     public static void Main(string[] args)
     {
@@ -18,10 +19,11 @@ class Entry
     public static VertexArray Vao, Vao2;
     public static Transform transform = new Transform();
     public static Camera camera = new Camera(new Transform(),60f);
+    public static Transform* camtrans;
     public static bool leftdown = false;
     public static bool rightdown = false;
-    private static float movespeed = 0.1f;
-    private static Key testkey = Key.L;
+    private static float movespeed = 5f;
+    private static float sensitivity = 0.4f;
 
     public static void Load()
     {   
@@ -110,15 +112,21 @@ class Entry
         Shader frag = new Shader("fragment/simple.frag");
         program = new ShaderProgram([vert, frag]);
 
-        Input.AddDownCallback(testkey, testinputthing);
+        Input.AddDownCallback(Key.K, ToggleWireframe);
+        Input.AddMouseMoveCallback(CameraMovement);
+
+        fixed ( Transform* t = &camera.transform )
+            camtrans = t;
+        camera.transform.Rotation = new Vector3(0, CMath.rad(270), 0);
     }
 
     public static void Render(double delta)
     {
+        float felta = (float)delta;
+
         program.Use();
         double T = Application.MainApp.window.Time;
-        float t = (float)T;
-        transform.Scale = 0.25f;
+        transform.Scale = new Vector3(0.25f,0.25f,0.25f);
         transform.Rotation += new Vector3(0.03f, 0.03f, 0f);
 
         float move = 0;
@@ -129,18 +137,22 @@ class Entry
         rot.X += Input.GetKey(Key.Left)? 0.02f : 0;
         rot.X += Input.GetKey(Key.Right)? -0.02f : 0;
 
-        bool u, d;
-        u = Input.GetKey(Key.Up);
-        d = Input.GetKey(Key.Down);
+        bool w, a, s, d, q, e;
+        w = Input.GetKey(Key.W);
+        s = Input.GetKey(Key.S);
+        a = Input.GetKey(Key.A);
+        d = Input.GetKey(Key.D);
+        q = Input.GetKey(Key.Q);
+        e = Input.GetKey(Key.E);
 
-        if (u) {move+=movespeed;}
-        if (d) {move-=movespeed;}
-        
+        if (w) camtrans->Position +=  camtrans->Forward * movespeed * felta;
+        if (s) camtrans->Position += -camtrans->Forward * movespeed * felta;
+        if (a) camtrans->Position +=  camtrans->Right   * movespeed * felta;
+        if (d) camtrans->Position += -camtrans->Right   * movespeed * felta;
+        if (e) camtrans->Position +=  camtrans->Up      * movespeed * felta;
+        if (q) camtrans->Position += -camtrans->Up      * movespeed * felta;
 
-        camera.transform.Position += camera.transform.Forward * move;
-        camera.transform.Rotation += new Vector3(rot.X,rot.Y,0f);
-
-        program.Uniform("transform",transform.world);
+        program.Uniform("transform",transform.World);
         program.Uniform("proj",camera.proj);
         program.Uniform("view",camera.view);
 
@@ -152,13 +164,23 @@ class Entry
             Position = new Vector3(0f, -.25f, 0f)
         };
 
-        program.Uniform("transform",trans2.world);
+        program.Uniform("transform",trans2.World);
         Vao2.Draw();
     }
     
-    private static void testinputthing()
+    private static bool wire = false;
+    private static void ToggleWireframe()
     {
-        Console.WriteLine("activated");
-        Input.RemoveDownCallback(testkey,testinputthing);
+        wire = !wire;
+        Video.SetWireframe(wire);
+    }
+
+    private static void CameraMovement(Vector2 mpos)
+    {
+        camera.transform.Rotation += new Vector3(
+           -CMath.rad(Input.MouseDelta.X/3) * sensitivity,
+            CMath.rad(Input.MouseDelta.Y/3) * sensitivity,
+            0f
+        );
     }
 }

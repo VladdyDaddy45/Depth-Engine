@@ -12,7 +12,8 @@ uniform float Time;
 
 void main()
 {
-    gl_Position = proj * view * transform * vec4(aPosition, 1.0);
-    
+    vec4 proposedPosition = proj * view * transform * vec4(aPosition, 1.0);
+    gl_Position = proposedPosition;
+
     vColor = vec4(aColor,1.0);
 }

@@ -29,4 +29,9 @@ public class Video
         foreach(Action<double> callback in RenderCallbacks)
         { callback(delta); }
     }
+
+    public static void SetWireframe(bool Bool)
+    {
+        gl.PolygonMode(GLEnum.FrontAndBack, Bool? GLEnum.Line : GLEnum.Fill);
+    }
 }

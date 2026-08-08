@@ -57,7 +57,7 @@ public class Mesh3D
         int index = 0;
         foreach (Mesh mesh in Instances)
         {
-            data[index] = mesh.transform.world;
+            data[index] = mesh.transform.World;
             index++;
         }
 

@@ -1,14 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
-using Silk.NET.OpenGL;
-using Silk.NET.GLFW;
 
-using Engine.Graphics;
 using Engine.User;
 using Engine.Graphics.Shaders;
-using Silk.NET.Windowing.Glfw;
 
 namespace Engine.Graphics;
 
@@ -19,9 +16,10 @@ public class Application
     
     public int width = 800;
     public int height = 600;
-    
+
     [NotNull]
     public IWindow window;
+    [NotNull]
     public WindowOptions options;
     [NotNull]
     public IInputContext input;
