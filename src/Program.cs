@@ -118,6 +118,8 @@ unsafe class Entry
         fixed ( Transform* t = &camera.transform )
             camtrans = t;
         camera.transform.Rotation = new Vector3(0, CMath.rad(270), 0);
+
+        Model.LoadObj("teapot.obj");
     }
 
     public static void Render(double delta)
@@ -128,6 +130,7 @@ unsafe class Entry
         double T = Application.MainApp.window.Time;
         transform.Scale = new Vector3(0.25f,0.25f,0.25f);
         transform.Rotation += new Vector3(0.03f, 0.03f, 0f);
+        transform.Position = new Vector3(0f,(float)Math.Sin(T),0f);
 
         float move = 0;
 
@@ -144,6 +147,7 @@ unsafe class Entry
         d = Input.GetKey(Key.D);
         q = Input.GetKey(Key.Q);
         e = Input.GetKey(Key.E);
+
 
         if (w) camtrans->Position +=  camtrans->Forward * movespeed * felta;
         if (s) camtrans->Position += -camtrans->Forward * movespeed * felta;
@@ -178,9 +182,9 @@ unsafe class Entry
     private static void CameraMovement(Vector2 mpos)
     {
         camera.transform.Rotation += new Vector3(
-           -CMath.rad(Input.MouseDelta.X/3) * sensitivity,
-            CMath.rad(Input.MouseDelta.Y/3) * sensitivity,
-            0f
+            -CMath.rad(Input.MouseDelta.X/3) * sensitivity,
+             CMath.rad(Input.MouseDelta.Y/3) * sensitivity,
+             0f
         );
     }
 }

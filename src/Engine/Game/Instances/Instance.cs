@@ -1,8 +1,9 @@
-namespace Engine.Game;
+namespace Engine.Game.Instances;
 
-public class Instance
+
+public unsafe class Instance
 {
-    public Instance Parent;
+    public int[]* properties;
 
     public Instance()
     {

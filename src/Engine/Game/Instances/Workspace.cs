@@ -1,6 +1,6 @@
-using Engine.Game;
+using Engine.Game.Instances;
 
-namespace Enigne.Game;
+namespace Enigne.Game.Instances;
 
 public class Workspace : Instance
 {
