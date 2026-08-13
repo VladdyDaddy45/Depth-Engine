@@ -1,73 +1,56 @@
 using Engine.Graphics;
 using Utils;
+using static System.Console;
 
 namespace Engine.Graphics;
 
 public unsafe class Model
 {
-    public static void LoadObj(string path)
+    public static VertexArray LoadObj(string path)
     {
         string text = Reader.ReadAll("assets/models/" + path);
         List<float> verts = new List<float>();
         List<uint> inds = new List<uint>();
         
-        for (int i = 0; i < text.Length; i++)
+        string[] elems = text.Split();
+
+        for (int i = 0; i < elems.Length; i++)
         {
-            switch (text[i])
+            switch (elems[i])
             {
-                case  'v':
-                    if (text[i+1] != ' ') break;
-                    string[] vertstrs = Extract3(text, i+2, " \n");
-                    verts.Add( float.Parse(vertstrs[0]) );
-                    verts.Add( float.Parse(vertstrs[1]) );
-                    verts.Add( float.Parse(vertstrs[2]) );
+                case "v":
+                    verts.AddRange([
+                        float.Parse(elems[i+1]),
+                        float.Parse(elems[i+2]),
+                        float.Parse(elems[i+3]),
+                    ]);
+                    verts.AddRange([
+                        (float)new Random().NextDouble(),
+                        (float)new Random().NextDouble(),
+                        (float)new Random().NextDouble()
+                    ]);
                     break;
-
-                case  'f':
-                    if (text[i+1] != ' ') break;
-                    string[] indstrs = Extract3(text, i+2, " \n");
-                    inds.Add( uint.Parse(indstrs[0]) );
-                    inds.Add( uint.Parse(indstrs[1]) );
-                    inds.Add( uint.Parse(indstrs[2]) );
-                    break;
-
-                case '\n':
+                
+                case "f":
+                    uint[] uints = new uint[3];
+                    for (int j = 1; j <= 3; j++)
+                    {
+                        WriteLine(j);
+                        uints[j-1] = uint.Parse(
+                            elems[i+j].Split(' ','/')[0]
+                        );
+                    }
+                    
+                    inds.AddRange(uints);
                     break;
             }
         }
 
+        VertexArray vao = new VertexArray(verts.ToArray(), 6);
+        vao.SetIndices(inds.ToArray());
+        vao.SetAttribute(0, 3, VertAttribType.Float);
+        vao.SetAttribute(1, 3, VertAttribType.Float);
 
-        VertexArray vao;
-        BufferObject<uint> buf;
-
-        //return new Mesh3D(vao);
-    }
-
-    private static string[] Extract3(string text, int start, string endchars)
-    {
-        string[] result = ["", "", ""];
-
-        int end = 0;
-
-        for (int i = 0; i < 3; i++)
-        {
-            char chr = text[start+end];
-            
-            int num = 0; // variable to prevent infinite loop
-            while ( num < 50 )
-            {
-                chr = text[start+end];
-                if (endchars.Contains(chr)) break;
-
-                result[i] += chr;
-                num++;
-                end++;
-            }
-
-            start += end+1;
-            end = 0;
-        }
-
-        return result;
+        return vao;
     }
 } 

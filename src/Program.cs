@@ -83,6 +83,8 @@ unsafe class Entry
         Vao.SetIndices(indices);
         Vao.SetAttribute(0, 3, VertAttribType.Float);
         Vao.SetAttribute(1, 3, VertAttribType.Float);
+
+        Vao = Model.LoadObj("teapot.obj");
         
         Mesh3D mesh = new Mesh3D(Vao);
         var inst = mesh.NewInstance();
@@ -118,8 +120,6 @@ unsafe class Entry
         fixed ( Transform* t = &camera.transform )
             camtrans = t;
         camera.transform.Rotation = new Vector3(0, CMath.rad(270), 0);
-
-        Model.LoadObj("teapot.obj");
     }
 
     public static void Render(double delta)
@@ -132,29 +132,12 @@ unsafe class Entry
         transform.Rotation += new Vector3(0.03f, 0.03f, 0f);
         transform.Position = new Vector3(0f,(float)Math.Sin(T),0f);
 
-        float move = 0;
-
-
-        Vector2 rot = new Vector2();
-
-        rot.X += Input.GetKey(Key.Left)? 0.02f : 0;
-        rot.X += Input.GetKey(Key.Right)? -0.02f : 0;
-
-        bool w, a, s, d, q, e;
-        w = Input.GetKey(Key.W);
-        s = Input.GetKey(Key.S);
-        a = Input.GetKey(Key.A);
-        d = Input.GetKey(Key.D);
-        q = Input.GetKey(Key.Q);
-        e = Input.GetKey(Key.E);
-
-
-        if (w) camtrans->Position +=  camtrans->Forward * movespeed * felta;
-        if (s) camtrans->Position += -camtrans->Forward * movespeed * felta;
-        if (a) camtrans->Position +=  camtrans->Right   * movespeed * felta;
-        if (d) camtrans->Position += -camtrans->Right   * movespeed * felta;
-        if (e) camtrans->Position +=  camtrans->Up      * movespeed * felta;
-        if (q) camtrans->Position += -camtrans->Up      * movespeed * felta;
+        if (Input.GetKey(Key.W)) camera.transform.Position +=  camera.transform.Forward * movespeed * felta;
+        if (Input.GetKey(Key.S)) camera.transform.Position += -camera.transform.Forward * movespeed * felta;
+        if (Input.GetKey(Key.A)) camera.transform.Position +=  camera.transform.Right   * movespeed * felta;
+        if (Input.GetKey(Key.D)) camera.transform.Position += -camera.transform.Right   * movespeed * felta;
+        if (Input.GetKey(Key.E)) camera.transform.Position +=  camera.transform.Up      * movespeed * felta;
+        if (Input.GetKey(Key.Q)) camera.transform.Position += -camera.transform.Up      * movespeed * felta;
 
         program.Uniform("transform",transform.World);
         program.Uniform("proj",camera.proj);

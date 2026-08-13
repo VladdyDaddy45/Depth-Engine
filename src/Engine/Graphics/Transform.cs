@@ -15,7 +15,7 @@ public struct Transform
 
     public Vector3 Position {
         get;
-        set { field = value; UpdateWorld(); }
+        set { field = value; UpdateVectors(); UpdateWorld(); }
     } = new Vector3(0f,0f,0f);
     
     public Vector3 Rotation {
@@ -30,7 +30,7 @@ public struct Transform
 
     public Vector3 Scale {
         get; 
-        set { field = value; UpdateWorld(); }
+        set { field = value; UpdateVectors(); UpdateWorld(); }
     }
 
     public Vector3 Forward, Right, Up;
