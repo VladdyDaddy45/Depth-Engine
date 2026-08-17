@@ -1,9 +1,12 @@
 ﻿using Engine.Graphics;
 using Engine.Graphics.Shaders;
-using Engine.User;
+using Engine.Parsers;
+using static Engine.User.Input;
 using Utils.CMath;
 using System.Numerics;
 using static System.Console;
+
+using f32 = float;
 
 unsafe class Entry
 {
@@ -27,104 +30,24 @@ unsafe class Entry
 
     public static void Load()
     {   
-        /*
-        // Quad vertices
-        float[] verts =
-        [//  x      y     z         r     g     b
-            -1.0f,  1.0f, 0.0f,     1.0f, 0.0f, 0.0f, // top left
-             1.0f,  1.0f, 0.0f,     0.0f, 1.0f, 0.0f, // top right
-            -1.0f, -1.0f, 0.0f,     0.0f, 0.0f, 1.0f, // bottom left
-             1.0f, -1.0f, 0.0f,     1.0f, 1.0f, 0.0f, // bottom right
-        ];
-
-        uint[] indices =
-        [
-            0, 1, 2,
-            1, 2, 3
-        ];
-        */
-
-        float[] verts = { // cube
-            // front
-            -1.0f, -1.0f,  1.0f,    1f, 0f, 0f,
-             1.0f, -1.0f,  1.0f,    0f, 1f, 0f,
-             1.0f,  1.0f,  1.0f,    0f, 0f, 1f,
-            -1.0f,  1.0f,  1.0f,    1f, 1f, 0f,
-            // back
-            -1.0f, -1.0f, -1.0f,    1f, 0f, 0f,
-             1.0f, -1.0f, -1.0f,    0f, 1f, 0f,
-             1.0f,  1.0f, -1.0f,    0f, 0f, 1f,
-            -1.0f,  1.0f, -1.0f,    1f, 1f, 0f,
-        };
-
-        uint[] indices =
-        {
-            // front
-            0, 1, 2,
-            2, 3, 0,
-            // right
-            1, 5, 6,
-            6, 2, 1,
-            // back
-            7, 6, 5,
-            5, 4, 7,
-            // left
-            4, 0, 3,
-            3, 7, 4,
-            // bottom
-            4, 5, 1,
-            1, 0, 4,
-            // top
-            3, 2, 6,
-            6, 7, 3
-        };
-
-        Vao = new VertexArray(verts, 6);
-        Vao.SetIndices(indices);
-        Vao.SetAttribute(0, 3, VertAttribType.Float);
-        Vao.SetAttribute(1, 3, VertAttribType.Float);
-
-        Vao = Model.LoadObj("teapot.obj");
-        
-        Mesh3D mesh = new Mesh3D(Vao);
-        var inst = mesh.NewInstance();
-
-        mesh.Draw();
-
-        float[] tri =
-        {
-            -1.0f,  1.0f, 0.0f,     1.0f, 0.0f, 0.0f, // top left
-             1.0f,  1.0f, 0.0f,     0.0f, 1.0f, 0.0f, // top right
-            -1.0f, -1.0f, 0.0f,     0.0f, 0.0f, 1.0f, // bottom left
-             1.0f, -1.0f, 0.0f,     1.0f, 1.0f, 0.0f, // bottom right
-        };
-
-        uint[] triInds =
-        {
-            0, 1, 2,
-            1, 2, 3
-        };
-
-        Vao2 = new VertexArray(tri,6);
-        Vao2.SetIndices(triInds);
-        Vao2.SetAttribute(0, 3, VertAttribType.Float);
-        Vao2.SetAttribute(1, 3, VertAttribType.Float);
+        Vao = ModelParser.ParseObj("teapot.obj");
+        Vao2 = ModelParser.ParseObj("plane.obj");
 
         Shader vert = new Shader("vertex/projection.vert");
         Shader frag = new Shader("fragment/simple.frag");
         program = new ShaderProgram([vert, frag]);
 
-        Input.AddDownCallback(Key.K, ToggleWireframe);
-        Input.AddMouseMoveCallback(CameraMovement);
+        AddDownCallback(Key.K, ToggleWireframe);
+        AddMouseMoveCallback(CameraMovement);
 
-        fixed ( Transform* t = &camera.transform )
-            camtrans = t;
-        camera.transform.Rotation = new Vector3(0, CMath.rad(270), 0);
+        camera.transform.Rotation = new Vector3(0, CMath.rad(-90), 0);
     }
+
+    // -- RENDERING!!!
 
     public static void Render(double delta)
     {
-        float felta = (float)delta;
+        f32 felta = (f32)delta;
 
         program.Use();
         double T = Application.MainApp.window.Time;
@@ -132,12 +55,12 @@ unsafe class Entry
         transform.Rotation += new Vector3(0.03f, 0.03f, 0f);
         transform.Position = new Vector3(0f,(float)Math.Sin(T),0f);
 
-        if (Input.GetKey(Key.W)) camera.transform.Position +=  camera.transform.Forward * movespeed * felta;
-        if (Input.GetKey(Key.S)) camera.transform.Position += -camera.transform.Forward * movespeed * felta;
-        if (Input.GetKey(Key.A)) camera.transform.Position +=  camera.transform.Right   * movespeed * felta;
-        if (Input.GetKey(Key.D)) camera.transform.Position += -camera.transform.Right   * movespeed * felta;
-        if (Input.GetKey(Key.E)) camera.transform.Position +=  camera.transform.Up      * movespeed * felta;
-        if (Input.GetKey(Key.Q)) camera.transform.Position += -camera.transform.Up      * movespeed * felta;
+        if (GetKey(Key.W)) camera.transform.Position +=  camera.transform.Forward * movespeed * felta;
+        if (GetKey(Key.S)) camera.transform.Position += -camera.transform.Forward * movespeed * felta;
+        if (GetKey(Key.A)) camera.transform.Position +=  camera.transform.Right   * movespeed * felta;
+        if (GetKey(Key.D)) camera.transform.Position += -camera.transform.Right   * movespeed * felta;
+        if (GetKey(Key.E)) camera.transform.Position +=  camera.transform.Up      * movespeed * felta;
+        if (GetKey(Key.Q)) camera.transform.Position += -camera.transform.Up      * movespeed * felta;
 
         program.Uniform("transform",transform.World);
         program.Uniform("proj",camera.proj);
@@ -165,9 +88,18 @@ unsafe class Entry
     private static void CameraMovement(Vector2 mpos)
     {
         camera.transform.Rotation += new Vector3(
-            -CMath.rad(Input.MouseDelta.X/3) * sensitivity,
-             CMath.rad(Input.MouseDelta.Y/3) * sensitivity,
+            -CMath.rad(MouseDelta.X/3) * sensitivity,
+             CMath.rad(MouseDelta.Y/3) * sensitivity,
              0f
         );
+        float Y = camera.transform.Rotation.Y;
+        float X = camera.transform.Rotation.X;
+        float Z = camera.transform.Rotation.Z;
+        if (Y > CMath.rad(90) || Y < CMath.rad(-90))
+            camera.transform.Rotation = new Vector3(
+                X,
+                (float)Math.Clamp(Y, CMath.rad(-90),CMath.rad(90)),
+                Z
+            );
     }
 }
