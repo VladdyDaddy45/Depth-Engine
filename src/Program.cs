@@ -22,16 +22,33 @@ unsafe class Entry
     public static VertexArray Vao, Vao2;
     public static Transform transform = new Transform();
     public static Camera camera = new Camera(new Transform(),60f);
+    public static Mesh teapot;
     public static Transform* camtrans;
     public static bool leftdown = false;
     public static bool rightdown = false;
-    private static float movespeed = 5f;
-    private static float sensitivity = 0.4f;
+    public static float movespeed = 5f;
+    public static float sensitivity = 0.4f; 
 
     public static void Load()
     {   
         Vao = ModelParser.ParseObj("teapot.obj");
         Vao2 = ModelParser.ParseObj("plane.obj");
+
+
+        Random random = new Random();
+        teapot = new Mesh(Vao);
+        for (int i = 0; i < 50000; i++)
+        {
+            Transform trans = new Transform();
+            trans.Position = new Vector3(
+                (random.NextSingle()-.5f)*100f,
+                (random.NextSingle()-.5f)*100f,
+                (random.NextSingle()-.5f)*100f
+            );
+
+            teapot.NewInstance(trans);
+        }
+        teapot.ProcessBuffer();
 
         Shader vert = new Shader("vertex/projection.vert");
         Shader frag = new Shader("fragment/simple.frag");
@@ -41,6 +58,7 @@ unsafe class Entry
         AddMouseMoveCallback(CameraMovement);
 
         camera.transform.Rotation = new Vector3(0, CMath.rad(-90), 0);
+        transform.Scale = new Vector3(.1f,.1f,.1f);
     }
 
     // -- RENDERING!!!
@@ -51,10 +69,13 @@ unsafe class Entry
 
         program.Use();
         double T = Application.MainApp.window.Time;
-        transform.Scale = new Vector3(0.25f,0.25f,0.25f);
-        transform.Rotation += new Vector3(0.03f, 0.03f, 0f);
-        transform.Position = new Vector3(0f,(float)Math.Sin(T),0f);
 
+
+        transform.Rotation += new Vector3(1f*felta,1f*felta,1f*felta);
+        transform.Position = new Vector3(1f*MathF.Sin((float)T),0f,0f);
+
+
+        movespeed = GetKey(Key.ShiftLeft)? 30f : 5f;
         if (GetKey(Key.W)) camera.transform.Position +=  camera.transform.Forward * movespeed * felta;
         if (GetKey(Key.S)) camera.transform.Position += -camera.transform.Forward * movespeed * felta;
         if (GetKey(Key.A)) camera.transform.Position +=  camera.transform.Right   * movespeed * felta;
@@ -62,20 +83,15 @@ unsafe class Entry
         if (GetKey(Key.E)) camera.transform.Position +=  camera.transform.Up      * movespeed * felta;
         if (GetKey(Key.Q)) camera.transform.Position += -camera.transform.Up      * movespeed * felta;
 
-        program.Uniform("transform",transform.World);
+        //program.Uniform("transform",transform.World);
         program.Uniform("proj",camera.proj);
         program.Uniform("view",camera.view);
+        program.Uniform("uTransform",transform.World);
 
-        Vao.Draw();
+        Console.WriteLine(transform.World.ToString());
 
-        Transform trans2 = new Transform
-        {
-            Rotation = new Vector3(0f, CMath.rad(90), 0f),
-            Position = new Vector3(0f, -.25f, 0f)
-        };
-
-        program.Uniform("transform",trans2.World);
-        Vao2.Draw();
+        //Vao.Draw();
+        teapot.Draw();
     }
     
     private static bool wire = false;
@@ -92,6 +108,7 @@ unsafe class Entry
              CMath.rad(MouseDelta.Y/3) * sensitivity,
              0f
         );
+
         float Y = camera.transform.Rotation.Y;
         float X = camera.transform.Rotation.X;
         float Z = camera.transform.Rotation.Z;

@@ -44,7 +44,8 @@ public class Application
         options = WindowOptions.Default with
         {
             Size = new Vector2D<int>(width, height),
-            Title = "Engine Testing"
+            Title = "Engine Testing",
+            Samples = 8,
         };
 
         window = Window.Create(options);

@@ -43,8 +43,6 @@ public struct Transform
         Rotation = Vector3.Lerp(Rotation, Target.Rotation, Amount);
     }
 
-
-
     private void UpdateVectors()
     {
         RotationMatrix = Matrix4x4.CreateFromYawPitchRoll(

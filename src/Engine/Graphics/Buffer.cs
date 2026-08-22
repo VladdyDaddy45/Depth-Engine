@@ -52,13 +52,13 @@ public struct VertAttrib
     public VertAttribType Type;
 };
 
-public class VertexArray
+public struct VertexArray
 {
     private static GL gl = Video.gl;
 
     private uint _vao;
     private float[] data;
-    private uint[] indices;
+    public uint[] indices;
     private uint stride;
     private VertAttrib[] attributes = new VertAttrib[1];
     private int attribNumber = 0;

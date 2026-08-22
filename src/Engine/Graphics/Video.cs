@@ -2,7 +2,7 @@ namespace Engine.Graphics;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-
+using Silk.NET.GLFW;
 using Silk.NET.OpenGL;
 using Silk.NET.Vulkan;
 
@@ -18,6 +18,11 @@ public class Video
         gl.ClearColor(Color.CornflowerBlue);
         gl.Enable(GLEnum.DepthTest);
         gl.DepthFunc(GLEnum.Less);
+        
+        gl.Enable(GLEnum.Multisample);
+        gl.Enable(GLEnum.CullFace);
+        gl.FrontFace(GLEnum.Ccw);  
+        gl.CullFace(GLEnum.FrontFace);
 
         app.AddRender(Render);
     }
