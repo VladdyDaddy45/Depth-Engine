@@ -1,6 +1,6 @@
 global using Key = Silk.NET.Input.Key;
 
-namespace Engine.User;
+namespace Engine.Game;
 
 using System.Numerics;
 using Engine.Graphics;

@@ -21,7 +21,7 @@ public class Camera
     {
         get
         {
-            return Matrix4x4.CreatePerspectiveFieldOfView(CMath.rad(fov), width / height, 0.1f, 1000.0f);
+            return Matrix4x4.CreatePerspectiveFieldOfView(CMath.rad(fov), width / height, 0.25f, 1000.0f);
         }
         set;
     }

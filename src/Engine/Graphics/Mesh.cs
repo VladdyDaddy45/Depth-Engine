@@ -100,5 +100,7 @@ public class Mesh
             (void*)0, 
             (uint)instances.Count
         );
+
+        gl.BindVertexArray(0);
     }
 }

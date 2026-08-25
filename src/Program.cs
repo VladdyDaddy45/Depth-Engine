@@ -1,12 +1,13 @@
 ﻿using Engine.Graphics;
 using Engine.Graphics.Shaders;
 using Engine.Parsers;
-using static Engine.User.Input;
+using static Engine.Game.Input;
 using Utils.CMath;
 using System.Numerics;
 using static System.Console;
 
 using f32 = float;
+using System.Timers;
 
 unsafe class Entry
 {
@@ -22,12 +23,13 @@ unsafe class Entry
     public static VertexArray Vao, Vao2;
     public static Transform transform = new Transform();
     public static Camera camera = new Camera(new Transform(),60f);
-    public static Mesh teapot;
+    public static Mesh teapot, plane;
     public static Transform* camtrans;
     public static bool leftdown = false;
     public static bool rightdown = false;
     public static float movespeed = 5f;
-    public static float sensitivity = 0.4f; 
+    public static float sensitivity = 0.4f;
+    public static float frames = 0;
 
     public static void Load()
     {   
@@ -37,7 +39,7 @@ unsafe class Entry
 
         Random random = new Random();
         teapot = new Mesh(Vao);
-        for (int i = 0; i < 50000; i++)
+        for (int i = 0; i < 2500; i++)
         {
             Transform trans = new Transform();
             trans.Position = new Vector3(
@@ -48,7 +50,12 @@ unsafe class Entry
 
             teapot.NewInstance(trans);
         }
+        plane = new Mesh(Vao2);
+        plane.NewInstance(new Transform());
+        plane.ProcessBuffer();
         teapot.ProcessBuffer();
+
+
 
         Shader vert = new Shader("vertex/projection.vert");
         Shader frag = new Shader("fragment/simple.frag");
@@ -58,13 +65,25 @@ unsafe class Entry
         AddMouseMoveCallback(CameraMovement);
 
         camera.transform.Rotation = new Vector3(0, CMath.rad(-90), 0);
-        transform.Scale = new Vector3(.1f,.1f,.1f);
+        //transform.Scale = new Vector3(.1f,.1f,.1f);
+
+        System.Timers.Timer fpstimer = new System.Timers.Timer();
+        fpstimer.Elapsed += new ElapsedEventHandler(CalcFPS);
+        fpstimer.Interval = 500;
+        fpstimer.Enabled = true;
+    }
+
+    public static void CalcFPS(object? source, ElapsedEventArgs? e)
+    {
+        WriteLine("FPS: " + frames*2);
+        frames = 0;
     }
 
     // -- RENDERING!!!
 
     public static void Render(double delta)
     {
+        frames++;
         f32 felta = (f32)delta;
 
         program.Use();
@@ -88,9 +107,9 @@ unsafe class Entry
         program.Uniform("view",camera.view);
         program.Uniform("uTransform",transform.World);
 
-        Console.WriteLine(transform.World.ToString());
+        //WriteLine(transform.World.ToString());
 
-        //Vao.Draw();
+        plane.Draw();
         teapot.Draw();
     }
     

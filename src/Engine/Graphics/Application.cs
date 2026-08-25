@@ -4,7 +4,6 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
-using Engine.User;
 using Engine.Graphics.Shaders;
 
 namespace Engine.Graphics;
@@ -46,6 +45,7 @@ public class Application
             Size = new Vector2D<int>(width, height),
             Title = "Engine Testing",
             Samples = 8,
+            VSync = false,
         };
 
         window = Window.Create(options);
@@ -62,7 +62,7 @@ public class Application
         input = window.CreateInput();
 
         Video.Init(MainApp);
-        Input.Init();
+        Game.Input.Init();
 
         for (int i = 0; i < input.Keyboards.Count; i++)
             input.Keyboards[i].KeyDown += KeyDown;
