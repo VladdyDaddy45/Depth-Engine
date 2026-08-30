@@ -36,7 +36,7 @@ public class Mesh
         
     }
 
-
+    
     public unsafe void ProcessBuffer()
     {
         buffer = gl.GenBuffers(1);
@@ -70,7 +70,42 @@ public class Mesh
             gl.BindVertexArray(0);
         }
     }
+    
 
+    /*
+    public unsafe void ProcessBuffer()
+    {
+        buffer = gl.GenBuffers(1);
+        gl.BindBuffer(GLEnum.ArrayBuffer, buffer);
+        Matrix3x3[] matrices = new Matrix3x3[instances.Count];
+
+        for (int i = 0; i < instances.Count; i++)
+        {
+            matrices[i] = instances[i].WorldMatrix;
+        }
+        fixed (Matrix3x3* transforms = matrices) {
+            gl.BufferData(GLEnum.ArrayBuffer, (uint)instances.Count * (uint)sizeof(Matrix3x3), &transforms[0], GLEnum.DynamicDraw);
+        }
+
+        for (int i = 0; i < instances.Count; i++)
+        {
+            instances[i].VAO.Bind();
+
+            gl.EnableVertexAttribArray(2);
+            for (uint j = 0; j < 4; j++)
+            {
+                gl.EnableVertexAttribArray(j+2);
+                gl.VertexAttribPointer(j+2, 4, GLEnum.Float, false, (uint)sizeof(Matrix3x3), (void*) (j * sizeof(Vector3)));
+            }
+
+            gl.VertexAttribDivisor(2, 1);
+            gl.VertexAttribDivisor(3, 1);
+            gl.VertexAttribDivisor(4, 1);
+
+            gl.BindVertexArray(0);
+        }
+    }
+    */
     public Instance NewInstance(Transform transform)
     {
         Instance instance;
