@@ -32,14 +32,14 @@ unsafe class Entry
     public static float frames = 0;
 
     public static void Load()
-    {   
+    {
         Vao = ModelParser.ParseObj("teapot.obj");
         Vao2 = ModelParser.ParseObj("plane.obj");
 
 
         Random random = new Random();
         teapot = new Mesh(Vao);
-        for (int i = 0; i < 2500; i++)
+        for (int i = 0; i < 50000; i++)
         {
             Transform trans = new Transform();
             trans.Position = new Vector3(
@@ -105,7 +105,14 @@ unsafe class Entry
         //program.Uniform("transform",transform.World);
         program.Uniform("proj",camera.proj);
         program.Uniform("view",camera.view);
-        program.Uniform("uTransform",transform.World);
+        
+        Vector3 col0 = new Vector3(transform.World.M11, transform.World.M21, transform.World.M31);
+        Vector3 col1 = new Vector3(transform.World.M12, transform.World.M22, transform.World.M32);
+        Vector3 col2 = new Vector3(transform.World.M13, transform.World.M23, transform.World.M33);
+
+        program.Uniform("col0", col0);
+        program.Uniform("col1", col1);
+        program.Uniform("col2", col2);
 
         //WriteLine(transform.World.ToString());
 

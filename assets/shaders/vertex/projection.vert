@@ -10,8 +10,13 @@ out vec4 vColor;
 
 uniform mat4 proj;
 uniform mat4 view;
-uniform mat4 uTransform;
+uniform vec3 col0;
+uniform vec3 col1;
+uniform vec3 col2;
 uniform float Time;
+
+mat3 m3 = mat3(col0, col1, col2);
+mat4 uTransform = mat4(m3);
 
 void main()
 {
