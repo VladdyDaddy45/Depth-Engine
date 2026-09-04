@@ -41,12 +41,14 @@ unsafe class Entry
         teapot = new Mesh(Vao);
         for (int i = 0; i < 50000; i++)
         {
-            Transform trans = new Transform();
-            trans.Position = new Vector3(
-                (random.NextSingle()-.5f)*100f,
-                (random.NextSingle()-.5f)*100f,
-                (random.NextSingle()-.5f)*100f
-            );
+            Transform trans = new Transform
+            {
+                Position = new Vector3(
+                    (random.NextSingle() - .5f) * 100f,
+                    (random.NextSingle() - .5f) * 100f,
+                    (random.NextSingle() - .5f) * 100f
+                )
+            };
 
             teapot.NewInstance(trans);
         }

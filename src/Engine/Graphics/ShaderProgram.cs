@@ -82,6 +82,12 @@ public unsafe class ShaderProgram
         linked = true;
     }
 
+    public void Attach(Shader shader)
+    { gl.AttachShader(program,shader.shader); }
+
+    public void Detach(Shader shader)
+    { gl.DetachShader(program, shader.shader); }
+
     public void Kill()
     {
         gl.DeleteProgram(program);
@@ -93,13 +99,6 @@ public unsafe class ShaderProgram
     {
         gl.DeleteProgram(program);
     }
-
-    public void Attach(Shader shader)
-    { gl.AttachShader(program,shader.shader); }
-
-    public void Detach(Shader shader)
-    { gl.DetachShader(program, shader.shader); }
-
 
     // NO. TOUCH.
     public static void Cleanup()

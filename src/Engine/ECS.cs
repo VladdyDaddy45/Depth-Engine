@@ -2,10 +2,15 @@ using Utils;
 
 namespace Engine.ECS;
 
-struct Position
+unsafe struct Position
 {
     public uint Entity;
     public uint Component;
+}
+
+unsafe struct Entity
+{
+    public unsafe int goob;
 }
 
 public unsafe class World
@@ -27,6 +32,8 @@ public unsafe class World
 
 public abstract class System
 {
+    public static World MainWorld = new World();
+
     public World world;
 
     public void Init()
