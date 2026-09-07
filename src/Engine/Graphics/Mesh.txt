@@ -1,11 +1,11 @@
 using System.Numerics;
-using Depth.Graphics;
+using Engine.Graphics;
 using Silk.NET.GLFW;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Vulkan;
 
-namespace Depth.Graphics;
+namespace Engine.Graphics;
 
 public class Mesh
 {
@@ -13,7 +13,7 @@ public class Mesh
 
     public struct Instance
     {
-        public Matrix4x4 WorldMatrix;
+        public Vector3[] WorldMatrix;
         public VertexArray VAO;
         public Mesh mesh;
         
@@ -32,6 +32,8 @@ public class Mesh
     {
         vao = VAO;
         objects.Add(this);
+
+        
     }
 
     
@@ -39,14 +41,48 @@ public class Mesh
     {
         buffer = gl.GenBuffers(1);
         gl.BindBuffer(GLEnum.ArrayBuffer, buffer);
-        Matrix4x4[] matrices = new Matrix4x4[instances.Count];
+        Vector3[][] matrices = new Vector3[instances.Count][];
+
+        for (int i = 0; i < instances.Count; i++)
+            matrices[i] = instances[i].WorldMatrix;
+        
+        fixed (Vector3[] transforms = matrices) 
+            gl.BufferData(GLEnum.ArrayBuffer, (uint)instances.Count * (uint)sizeof(Vector3)*3, &transforms[0], GLEnum.DynamicDraw);
+        
+
+        for (int i = 0; i < instances.Count; i++)
+        {
+            instances[i].VAO.Bind();
+
+            gl.EnableVertexAttribArray(2);
+            for (uint j = 0; j < 3; j++)
+            {
+                gl.EnableVertexAttribArray(j+2);
+                gl.VertexAttribPointer(j+2, 3, GLEnum.Float, false, (uint)sizeof(Vector3)*3, (void*) (j * sizeof(Vector3)));
+            }
+
+            gl.VertexAttribDivisor(2, 1);
+            gl.VertexAttribDivisor(3, 1);
+            gl.VertexAttribDivisor(4, 1);
+
+            gl.BindVertexArray(0);
+        }
+    }
+    
+
+    /*
+    public unsafe void ProcessBuffer()
+    {
+        buffer = gl.GenBuffers(1);
+        gl.BindBuffer(GLEnum.ArrayBuffer, buffer);
+        Matrix3x3[] matrices = new Matrix3x3[instances.Count];
 
         for (int i = 0; i < instances.Count; i++)
         {
             matrices[i] = instances[i].WorldMatrix;
         }
-        fixed (Matrix4x4* transforms = matrices) {
-            gl.BufferData(GLEnum.ArrayBuffer, (uint)instances.Count * (uint)sizeof(Matrix4x4), &transforms[0], GLEnum.DynamicDraw);
+        fixed (Matrix3x3* transforms = matrices) {
+            gl.BufferData(GLEnum.ArrayBuffer, (uint)instances.Count * (uint)sizeof(Matrix3x3), &transforms[0], GLEnum.DynamicDraw);
         }
 
         for (int i = 0; i < instances.Count; i++)
@@ -57,23 +93,22 @@ public class Mesh
             for (uint j = 0; j < 4; j++)
             {
                 gl.EnableVertexAttribArray(j+2);
-                gl.VertexAttribPointer(j+2, 4, GLEnum.Float, false, (uint)sizeof(Matrix4x4), (void*) (j * sizeof(Vector4)));
+                gl.VertexAttribPointer(j+2, 4, GLEnum.Float, false, (uint)sizeof(Matrix3x3), (void*) (j * sizeof(Vector3)));
             }
 
             gl.VertexAttribDivisor(2, 1);
             gl.VertexAttribDivisor(3, 1);
             gl.VertexAttribDivisor(4, 1);
-            gl.VertexAttribDivisor(5, 1);
 
             gl.BindVertexArray(0);
         }
     }
-    
+    */
     public Instance NewInstance(Transform transform)
     {
         Instance instance;
         
-        instance.WorldMatrix = transform.World;
+        instance.WorldMatrix = Transform.ToMatrix3x3(transform);
         instance.VAO = vao;
         instance.mesh = this;
 

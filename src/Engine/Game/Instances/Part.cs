@@ -1,7 +1,7 @@
-using Engine.Game.Instances;
-using Engine.Graphics;
+using Depth.Game.Instances;
+using Depth.Graphics;
 
-namespace Engine.Game.Instances;
+namespace Depth.Game.Instances;
 
 public struct Part
 {

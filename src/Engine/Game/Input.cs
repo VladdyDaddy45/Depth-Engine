@@ -1,9 +1,9 @@
 global using Key = Silk.NET.Input.Key;
 
-namespace Engine.Game;
+namespace Depth.Game;
 
 using System.Numerics;
-using Engine.Graphics;
+using Depth.Graphics;
 using Silk.NET.Input;
 
 public class Input

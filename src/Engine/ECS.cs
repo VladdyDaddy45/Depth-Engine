@@ -1,6 +1,6 @@
 using Utils;
 
-namespace Engine.ECS;
+namespace Depth.ECS;
 
 unsafe struct Position
 {

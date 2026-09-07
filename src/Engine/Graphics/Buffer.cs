@@ -2,7 +2,7 @@ global using BufferUsageARB = Silk.NET.OpenGL.BufferUsageARB;
 global using BufferTargetARB = Silk.NET.OpenGL.BufferTargetARB;
 global using VertAttribType = Silk.NET.OpenGL.VertexAttribPointerType;
 
-namespace Engine.Graphics;
+namespace Depth.Graphics;
 using Silk.NET.OpenGL;
 
 

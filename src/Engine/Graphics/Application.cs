@@ -4,9 +4,9 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
-using Engine.Graphics.Shaders;
+using Depth.Graphics.Shaders;
 
-namespace Engine.Graphics;
+namespace Depth.Graphics;
 
 public class Application
 {   

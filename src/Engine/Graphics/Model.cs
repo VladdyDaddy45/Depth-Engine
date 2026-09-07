@@ -1,7 +1,7 @@
-using Engine.Graphics;
+using Depth.Graphics;
 using static System.Console;
 
-namespace Engine.Graphics;
+namespace Depth.Graphics;
 
 public unsafe class Model
 {

@@ -1,8 +1,8 @@
 using Assimp;
 using Utils;
-using Engine.Graphics;
+using Depth.Graphics;
 
-namespace Engine.Parsers;
+namespace Depth.Parsers;
 
 public static class ModelParser
 {

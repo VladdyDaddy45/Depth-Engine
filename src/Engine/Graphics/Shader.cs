@@ -4,7 +4,7 @@ using Silk.NET.OpenGL;
 using Utils;
 
 
-namespace Engine.Graphics.Shaders;
+namespace Depth.Graphics.Shaders;
 
 // Class for managing singular shaders
 public class Shader

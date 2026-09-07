@@ -1,6 +1,6 @@
-using Engine.Game.Instances;
+using Depth.Game.Instances;
 
-namespace Engine.Game.Instances;
+namespace Depth.Game.Instances;
 
 public class Workspace : Instance
 {

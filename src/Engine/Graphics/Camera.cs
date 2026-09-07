@@ -2,9 +2,9 @@ using Silk.NET.OpenGL;
 using Silk.NET.Maths;
 using Utils.CMath;
 using System.Numerics;
-using Engine.Graphics;
+using Depth.Graphics;
 
-namespace Engine.Graphics;
+namespace Depth.Graphics;
 
 public class Camera
 {

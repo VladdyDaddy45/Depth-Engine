@@ -1,4 +1,4 @@
-namespace Engine.Graphics;
+namespace Depth.Graphics;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;

@@ -1,7 +1,7 @@
-﻿using Engine.Graphics;
-using Engine.Graphics.Shaders;
-using Engine.Parsers;
-using static Engine.Game.Input;
+﻿using Depth.Graphics;
+using Depth.Graphics.Shaders;
+using Depth.Parsers;
+using static Depth.Game.Input;
 using Utils.CMath;
 using System.Numerics;
 using static System.Console;
@@ -57,8 +57,6 @@ unsafe class Entry
         plane.ProcessBuffer();
         teapot.ProcessBuffer();
 
-
-
         Shader vert = new Shader("vertex/projection.vert");
         Shader frag = new Shader("fragment/simple.frag");
         program = new ShaderProgram([vert, frag]);
@@ -69,20 +67,10 @@ unsafe class Entry
         camera.transform.Rotation = new Vector3(0, CMath.rad(-90), 0);
         //transform.Scale = new Vector3(.1f,.1f,.1f);
 
-        System.Timers.Timer fpstimer = new System.Timers.Timer();
-        fpstimer.Elapsed += new ElapsedEventHandler(CalcFPS);
-        fpstimer.Interval = 500;
-        fpstimer.Enabled = true;
+        Depth.Script.RunAll();
     }
 
-    public static void CalcFPS(object? source, ElapsedEventArgs? e)
-    {
-        WriteLine("FPS: " + frames*2);
-        frames = 0;
-    }
-
-    // -- RENDERING!!!
-
+//  -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- 
     public static void Render(double delta)
     {
         frames++;

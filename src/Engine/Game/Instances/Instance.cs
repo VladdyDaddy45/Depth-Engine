@@ -1,4 +1,4 @@
-namespace Engine.Game.Instances;
+namespace Depth.Game.Instances;
 
 
 public unsafe class Instance

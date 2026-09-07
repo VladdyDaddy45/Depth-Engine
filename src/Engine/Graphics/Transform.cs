@@ -1,8 +1,9 @@
 using System.Numerics;
 using Utils.CMath;
 using Silk.NET.Maths;
+using Depth.ECS;
 
-namespace Engine.Graphics;
+namespace Depth.Graphics;
 
 public struct Transform
 {
@@ -67,5 +68,19 @@ public struct Transform
         Matrix4x4.CreateFromQuaternion(Orientation) *
         Matrix4x4.CreateTranslation(Position);
     }
+
+    
+    public static Vector3[] ToMatrix3x3(Transform t)
+    {
+        Matrix4x4 wrld = t.World;
+        Vector3[] mat =
+        [
+            new Vector3(wrld.M11, wrld.M12, wrld.M13),
+            new Vector3(wrld.M21, wrld.M22, wrld.M23),
+            new Vector3(wrld.M31, wrld.M32, wrld.M33),
+        ];
+        return mat;
+    }
+    
 
 }
