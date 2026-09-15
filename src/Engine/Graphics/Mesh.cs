@@ -42,12 +42,11 @@ public class Mesh
         Matrix4x4[] matrices = new Matrix4x4[instances.Count];
 
         for (int i = 0; i < instances.Count; i++)
-        {
             matrices[i] = instances[i].WorldMatrix;
-        }
-        fixed (Matrix4x4* transforms = matrices) {
+        
+        fixed (Matrix4x4* transforms = matrices)
             gl.BufferData(GLEnum.ArrayBuffer, (uint)instances.Count * (uint)sizeof(Matrix4x4), &transforms[0], GLEnum.DynamicDraw);
-        }
+        
 
         for (int i = 0; i < instances.Count; i++)
         {

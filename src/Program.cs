@@ -4,10 +4,8 @@ using Depth.Parsers;
 using static Depth.Game.Input;
 using Utils.CMath;
 using System.Numerics;
-using static System.Console;
 
 using f32 = float;
-using System.Timers;
 
 unsafe class Entry
 {
@@ -29,7 +27,6 @@ unsafe class Entry
     public static bool rightdown = false;
     public static float movespeed = 5f;
     public static float sensitivity = 0.4f;
-    public static float frames = 0;
 
     public static void Load()
     {
@@ -39,7 +36,7 @@ unsafe class Entry
 
         Random random = new Random();
         teapot = new Mesh(Vao);
-        for (int i = 0; i < 50000; i++)
+        for (int i = 0; i < 10000; i++)
         {
             Transform trans = new Transform
             {
@@ -57,7 +54,7 @@ unsafe class Entry
         plane.ProcessBuffer();
         teapot.ProcessBuffer();
 
-        Shader vert = new Shader("vertex/projection.vert");
+        Shader vert = new Shader("vertex/projection.vs");
         Shader frag = new Shader("fragment/simple.frag");
         program = new ShaderProgram([vert, frag]);
 
@@ -65,15 +62,13 @@ unsafe class Entry
         AddMouseMoveCallback(CameraMovement);
 
         camera.transform.Rotation = new Vector3(0, CMath.rad(-90), 0);
-        //transform.Scale = new Vector3(.1f,.1f,.1f);
 
-        Depth.Script.RunAll();
+        Depth.Script.ExecuteScripts();
     }
 
 //  -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- 
     public static void Render(double delta)
     {
-        frames++;
         f32 felta = (f32)delta;
 
         program.Use();

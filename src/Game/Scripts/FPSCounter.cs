@@ -1,15 +1,13 @@
 using Depth;
-using Depth.Graphics;
-
 using System.Timers;
 
-public class FramerateCounter : Script
+class FramerateCounter : Script
 {
-    private uint frames = 0;
+    uint frames = 0;
 
     void Init()
     {
-        Video.RenderCallbacks.Add(Count);
+        Depth.Graphics.Video.RenderCallbacks.Add(Count);
 
         System.Timers.Timer fpstimer = new System.Timers.Timer();
         fpstimer.Elapsed += new ElapsedEventHandler(CalcFPS);

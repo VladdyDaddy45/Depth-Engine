@@ -2,32 +2,53 @@ using System.Reflection;
 
 namespace Depth; // in the topmost namespace so scripting is easier.
 
+struct Callback
+{
+    public Script? script;
+    public MethodInfo? methodInfo;
+};
+
 public abstract class Script
 {
+    private static List<Callback> renderCallbacks = new List<Callback>();
+
     // DO. NOT. TOUCH.
-    public static void RunAll()
+    public static void ExecuteScripts()
     {
         Type baseType = typeof(Script);
-        var assembly = baseType.Assembly;
+        Assembly assembly = baseType.Assembly;
         var scripts = assembly.GetTypes().Where(t => t.IsSubclassOf(baseType));
 
         foreach(Type t in scripts)
         {
-            Script instance = (Script)Activator.CreateInstance(t);
-            var init = GetInstanceMethod(instance, "Init");
-            init?.Invoke(instance,null);
+            Script? script = (Script?)Activator.CreateInstance(t);
+            GetInstanceMethod(script, "Init")?
+                .Invoke(script,null);
+            
+            renderCallbacks.Add(new Callback {
+                methodInfo = GetInstanceMethod(script, "Render"),
+                script = script
+            });
         }
+
+        Graphics.Video.RenderCallbacks.Add(OnRender);
     }
-    
-    private static MethodInfo? GetInstanceMethod(Script? instance, string name)
+
+    static void OnRender(double delta)
     {
-        return instance?
-        .GetType()
-        .GetMethod(
-            name,
-            BindingFlags.Instance | 
-            BindingFlags.Public | 
-            BindingFlags.NonPublic
-        );
+        foreach (var callback in renderCallbacks)
+            callback.methodInfo?.Invoke(callback.script,[delta]);
+        
+    }
+
+    static MethodInfo? GetInstanceMethod(Script? script, string name)
+    {
+        return script?
+            .GetType().GetMethod(
+                name,
+                BindingFlags.Instance | 
+                BindingFlags.Public | 
+                BindingFlags.NonPublic
+            );
     }
 }
