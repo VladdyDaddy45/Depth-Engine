@@ -1,6 +1,6 @@
 ﻿using Depth.Graphics;
 using Depth.Graphics.Shaders;
-using Depth.Parsers;
+using Depth.Parsing;
 using static Depth.Game.Input;
 using Utils.CMath;
 using System.Numerics;

@@ -29,14 +29,15 @@ public class Shader
     public static Reader reader = new Reader("assets/shaders");
 
     public string code;
+    public string filepath;
     public uint shader;
     public bool compiled = false;
     public ShaderType type;
 
-
     public Shader(string path)
     {
         code = @"" + reader.ReadAllText(path);
+        filepath = path;
 
         ShaderType? pendingType = null;
 
@@ -57,9 +58,9 @@ public class Shader
 
     private bool CheckShaderTypeFromPath(string path, string[] extensions)
     {
-        foreach (string ext in extensions) {
+        foreach (string ext in extensions) 
             if (Reader.GetExtension(path) == "." + ext) return true;
-        }
+        
         return false;
     }
 
@@ -73,7 +74,7 @@ public class Shader
         if (status != (int) GLEnum.True)
             throw new Exception(type.ToString() + " failed to compile:" + gl.GetShaderInfoLog(shader));
 
-        compiled = true;        
+        compiled = true;   
     }
 
     public void Delete()

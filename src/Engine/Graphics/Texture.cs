@@ -21,6 +21,8 @@ public class Texture
         wrap = Wrap;
 
         gl.TexParameter(TextureTarget.Texture2D, GLEnum.TextureWrapS, (int) GLEnum.ClampToEdge);
+        gl.TexParameter(TextureTarget.Texture2D, GLEnum.TextureWrapT, (int) GLEnum.ClampToEdge);
+        gl.TexParameter(TextureTarget.Texture2D, GLEnum.TextureWrapR, (int) GLEnum.ClampToEdge);
     }
 
     public void Apply()
