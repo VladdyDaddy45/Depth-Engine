@@ -16,63 +16,27 @@ public struct Transform
 
     public Vector3 Position {
         get;
-        set { field = value; UpdateVectors(); UpdateWorld(); }
+        set { field = value; UpdateAll();
+        }
     } = new Vector3(0f,0f,0f);
     
     public Vector3 Rotation {
         get; 
-        set {
-            // TODO: make this dynamically add or remove pi radians to prevent floating point errors
-            field = value;
-            UpdateVectors(); 
-            UpdateWorld(); 
-        }
+        set { field = value; UpdateAll(); }
     } = new Vector3(0f,0f,0f);
 
     public Vector3 Scale {
         get; 
-        set { field = value; UpdateVectors(); UpdateWorld(); }
-    }
+        set { field = value; UpdateAll(); }
+    } = new Vector3(1f,1f,1f);
 
     public Vector3 Forward, Right, Up;
     public Matrix4x4 World, RotationMatrix;
     public Quaternion Orientation;
 
-    public void Lerp(Transform Target, float Amount)
+    public static Vector3[] ToMatrix3x3(Transform T)
     {
-        Position = Vector3.Lerp(Position, Target.Position, Amount);
-        Rotation = Vector3.Lerp(Rotation, Target.Rotation, Amount);
-    }
-
-    private void UpdateVectors()
-    {
-        RotationMatrix = Matrix4x4.CreateFromYawPitchRoll(
-            Rotation.X, 
-            Rotation.Y, 
-            Rotation.Z
-        );
-
-        Forward = Vector3.Transform(Vector3.UnitZ, RotationMatrix);
-        Right = Vector3.Transform(Vector3.UnitX, RotationMatrix);
-        Up = Vector3.Transform(Vector3.UnitY, RotationMatrix);
-    }
-
-    private void UpdateWorld()
-    {
-        Orientation = Quaternion.Identity * 
-        Quaternion.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
-
-        World =
-        Matrix4x4.Identity * 
-        Matrix4x4.CreateScale(Scale) *
-        Matrix4x4.CreateFromQuaternion(Orientation) *
-        Matrix4x4.CreateTranslation(Position);
-    }
-
-    
-    public static Vector3[] ToMatrix3x3(Transform t)
-    {
-        Matrix4x4 wrld = t.World;
+        Matrix4x4 wrld = T.World;
         Vector3[] mat =
         [
             new Vector3(wrld.M11, wrld.M12, wrld.M13),
@@ -81,6 +45,40 @@ public struct Transform
         ];
         return mat;
     }
-    
 
+
+
+    private unsafe void UpdateAll()
+    {
+        fixed (Transform* T = &this)
+        {
+            UpdateWorld(T);
+            UpdateVectors(T);
+        }
+    }
+
+    private unsafe void UpdateVectors(Transform* T)
+    {
+        RotationMatrix = Matrix4x4.CreateFromYawPitchRoll(
+            T->Rotation.X, 
+            T->Rotation.Y, 
+            T->Rotation.Z
+        );
+
+        T->Forward = Vector3.Transform(Vector3.UnitZ, T->RotationMatrix);
+        T->Right = Vector3.Transform(Vector3.UnitX, T->RotationMatrix);
+        T->Up = Vector3.Transform(Vector3.UnitY, T->RotationMatrix);
+    }
+
+    private unsafe static void UpdateWorld(Transform* T)
+    {
+        T->Orientation = Quaternion.Identity * 
+        Quaternion.CreateFromYawPitchRoll(T->Rotation.X, T->Rotation.Y, T->Rotation.Z);
+
+        T->World =
+        Matrix4x4.Identity * 
+        Matrix4x4.CreateScale(T->Scale) *
+        Matrix4x4.CreateFromQuaternion(T->Orientation) *
+        Matrix4x4.CreateTranslation(T->Position);
+    }
 }

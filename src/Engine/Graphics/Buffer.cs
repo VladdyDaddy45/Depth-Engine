@@ -38,7 +38,5 @@ public class BufferObject<T>
     }
 
     public void Unbind()
-    {
-        gl.BindBuffer(target,0);
-    }
+    { gl.BindBuffer(target, 0); }
 }

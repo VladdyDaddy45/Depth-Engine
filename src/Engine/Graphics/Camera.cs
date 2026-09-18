@@ -3,11 +3,15 @@ using Silk.NET.Maths;
 using Utils.CMath;
 using System.Numerics;
 using Depth.Graphics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Depth.Graphics;
 
 public class Camera
 {
+    [NotNull]
+    public static Camera? CurrentCamera;
+
     private static GL gl = Video.gl;
     private static float width => (float)Application.MainApp.width;
     private static float height => (float)Application.MainApp.height;
@@ -30,5 +34,18 @@ public class Camera
     {
         transform = Trans;
         fov = FOV;
+
+        if (CurrentCamera == null)
+            setAsCurrent();
+    }
+
+    public void Draw()
+    {
+        
+    }
+
+    public void setAsCurrent()
+    {
+        CurrentCamera = this;
     }
 }

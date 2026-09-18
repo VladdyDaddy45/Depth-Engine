@@ -13,7 +13,7 @@ public abstract class Script
     private static List<Callback> renderCallbacks = new List<Callback>();
 
     // DO. NOT. TOUCH.
-    public static void ExecuteScripts()
+    public static void ExecuteScripts(string[] args)
     {
         Type baseType = typeof(Script);
         Assembly assembly = baseType.Assembly;
@@ -22,9 +22,19 @@ public abstract class Script
         foreach(Type t in scripts)
         {
             Script? script = (Script?)Activator.CreateInstance(t);
-            GetInstanceMethod(script, "Init")?
-                .Invoke(script,null);
+
+            var init = GetInstanceMethod(script, "Init");
+            var parameters = init?.GetParameters();
+
+            if (parameters?.Length == 0)
+                init?.Invoke(script, null);
+
+            else if (parameters?[0].ParameterType == typeof(string[]))
+                    init?.Invoke(script, [args]);
+                else
+                    throw new Exception("\nDepth Script Error: \n\tIllegal parameter type in Init method.");
             
+
             renderCallbacks.Add(new Callback {
                 methodInfo = GetInstanceMethod(script, "Render"),
                 script = script
@@ -38,7 +48,6 @@ public abstract class Script
     {
         foreach (var callback in renderCallbacks)
             callback.methodInfo?.Invoke(callback.script,[delta]);
-        
     }
 
     static MethodInfo? GetInstanceMethod(Script? script, string name)
