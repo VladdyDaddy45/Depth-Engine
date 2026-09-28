@@ -3,7 +3,13 @@ using static System.Console;
 
 namespace Depth.Graphics;
 
-public unsafe class Model
+public struct DetailLevel
+{
+    public Mesh mesh;
+    public float distance;
+}
+
+public class Model
 {
     
-} 
+}

@@ -35,6 +35,11 @@ public class Application
         MainApp.window.Dispose();
     }
 
+    public static void Close()
+    {
+        
+    }
+
     private Application(int Width, int Height)
     {
         width = Width;
@@ -54,7 +59,7 @@ public class Application
         window.Update += Update;
         window.Render += Render;
         window.FramebufferResize += FramebufferResize;
-        window.Closing += Close;
+        window.Closing += Shutdown;
     }
 
     private void Load()
@@ -74,7 +79,7 @@ public class Application
     private void Render(double deltaTime)
     {}
 
-    private void Close()
+    private void Shutdown()
     {
         ShaderProgram.Cleanup();
     }
@@ -109,7 +114,5 @@ public class Application
     { window.Closing += method; }
 
     ~Application()
-    {
-        Close();
-    }
+    { Shutdown(); }
 }

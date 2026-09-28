@@ -11,43 +11,41 @@ public struct VertAttrib
     public VertAttribType Type;
 };
 
-public struct VertexArray
+public class VertexArray
 {
     private static GL gl = Video.gl;
 
-    private uint _vao;
-    private float[] data;
-    public uint[] indices;
-    private uint stride;
-    private VertAttrib[] attributes = new VertAttrib[1];
-    private int attribNumber = 0;
+    public uint handle;
+    public uint stride;
+    public VertAttrib[] attributes = new VertAttrib[1];
+    public int attribNumber = 0;
 
     public BufferObject<float> VBO;
-    public BufferObject<uint>? EBO;
+    public BufferObject<uint> EBO;
 
-    public VertexArray(float[] Data, uint Stride)
+    public VertexArray(float[] data, uint[] inds, uint Stride)
     {
-        _vao = gl.GenVertexArray();
-        Bind();
-
-        data = Data;
+        handle = gl.GenVertexArray();
         stride = Stride;
-        
+        Bind();
         VBO = new BufferObject<float>(data, BufferTargetARB.ArrayBuffer);
+        EBO = new BufferObject<uint>(inds,BufferTargetARB.ElementArrayBuffer);
+        Unbind();
     }
 
     public unsafe void Draw()
     {
         Bind();
-        gl.DrawElements(PrimitiveType.Triangles, (uint)indices.Length, DrawElementsType.UnsignedInt, (void*) 0);
+        gl.DrawElements(PrimitiveType.Triangles, (uint)EBO.data.Length, DrawElementsType.UnsignedInt, (void*) 0);
+        Unbind();
     }
 
-    public unsafe void SetAttribute(uint Position, uint Size, VertAttribType Type)
+    public unsafe void AttribPointer(uint Position, uint Size, VertAttribType Type)
     {
         Bind();
         VBO.Bind();
         EBO?.Bind();
-        
+
         gl.EnableVertexAttribArray(Position);
         gl.VertexAttribPointer(
             Position, 
@@ -58,44 +56,33 @@ public struct VertexArray
             (void*) (0 + (Position * Size * sizeof(float)))
         );
 
-        VertAttrib attrib;
-        attrib.Position = Position;
-        attrib.Size = Size;
-        attrib.Type = Type;
-
-        AddAttribute(attrib);
+        AddAttribute(
+        new VertAttrib {
+            Position = Position,
+            Size = Size,
+            Type = Type
+        });
 
         Unbind();
         VBO.Unbind();
         EBO?.Unbind();
     }
 
-    public void SetIndices(uint[] Indices)
-    {
-        indices = Indices;
-        EBO = new BufferObject<uint>(indices,BufferTargetARB.ElementArrayBuffer);
-    }
-
     public void Bind()
-    {
-        gl.BindVertexArray(_vao);
-    }
+    { gl.BindVertexArray(handle); }
 
     public void Unbind()
-    {
-        gl.BindVertexArray(0);
-    }
+    { gl.BindVertexArray(0); }
 
     private void AddAttribute(VertAttrib attrib)
     {
-
         attribNumber++;
-        VertAttrib[] holder = new VertAttrib[attribNumber];
+        VertAttrib[] temp = new VertAttrib[attribNumber];
 
         for (int i = 0; i < attributes.Length; i++) 
-            holder[i] = attributes[i];
+            temp[i] = attributes[i];
 
-        holder[attribNumber-1] = attrib;
-        attributes = holder;
+        temp[attribNumber-1] = attrib;
+        attributes = temp;
     }
 }

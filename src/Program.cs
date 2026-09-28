@@ -8,6 +8,10 @@ using System.Numerics;
 unsafe class Entry
 {
     static string[] Args = [];
+    static ShaderProgram program;
+    static Transform transform = new Transform();
+    static Mesh thing;
+
     public static void Main(string[] args)
     {
         Application.Init(1200, 800);
@@ -18,36 +22,33 @@ unsafe class Entry
         Application.Start();
     }
 
-    public static ShaderProgram program, prog2;
-    public static VertexArray Vao, Vao2;
-    public static Transform transform = new Transform();
-    public static Mesh teapot, plane;
-
-    public static void Load()
+    static void Load()
     {
-        Vao = ModelParser.ParseObj("teapot.obj");
-        Vao2 = ModelParser.ParseObj("plane.obj");
-
-
+        Obj.Load("assets/models/cube.obj");
+        
         Random random = new Random();
-        teapot = new Mesh(Vao);
+        thing = Obj.meshes[0];
+
         for (int i = 0; i < 10000; i++)
         {
             Transform trans = new Transform
             {
                 Position = new Vector3(
-                    (random.NextSingle() - .5f) * 100f,
-                    (random.NextSingle() - .5f) * 100f,
-                    (random.NextSingle() - .5f) * 100f
-                )
+                    (random.NextSingle() - .5f) * 100,
+                    (random.NextSingle() - .5f) * 100,
+                    (random.NextSingle() - .5f) * 100
+                ),/*
+                Scale = new Vector3(
+                    random.NextSingle(),
+                    random.NextSingle(),
+                    random.NextSingle()
+                )*/
             };
 
-            teapot.NewInstance(trans);
+            thing.NewInstance(trans);
         }
-        plane = new Mesh(Vao2);
-        plane.NewInstance(new Transform());
-        plane.ProcessBuffer();
-        teapot.ProcessBuffer();
+
+        thing.ProcessBuffer();
 
         Shader vert = new Shader("vertex/projection.vs");
         Shader frag = new Shader("fragment/simple.frag");
@@ -59,32 +60,34 @@ unsafe class Entry
     }
 
 //  -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- RENDERING -- 
-    public static void Render(double delta)
+    static void Render(double delta)
     {
         float felta = (float)delta;
 
         program.Use();
         double T = Application.MainApp.window.Time;
+        float tsin = MathF.Sin((float)T);
 
-
-        transform.Rotation += new Vector3(1f*felta,1f*felta,1f*felta);
-        transform.Position = new Vector3(1f*MathF.Sin((float)T),0f,0f);
+        //transform.Rotation += new Vector3(felta, felta, felta);
+        transform.Position = new Vector3(tsin,0f,0f);
+        
+        var mat3 = Transform.ToMatrix3x3(transform);
 
         program.Uniform("proj",Camera.CurrentCamera.proj);
         program.Uniform("view",Camera.CurrentCamera.view);
-        
-        var mat3 = Transform.ToMatrix3x3(transform);
+
+        program.Uniform("LightDirection", new Vector3(tsin, 1, 0));
+        program.Uniform("AmbientLight", .01f);
 
         program.Uniform("col0", mat3[0]);
         program.Uniform("col1", mat3[1]);
         program.Uniform("col2", mat3[2]);
 
-        plane.Draw();
-        teapot.Draw();
+        thing.Draw();
     }
     
-    private static bool wire = false;
-    private static void ToggleWireframe()
+    static bool wire = false;
+    static void ToggleWireframe()
     {
         wire = !wire;
         Video.SetWireframe(wire);

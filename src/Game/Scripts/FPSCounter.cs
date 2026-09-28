@@ -1,7 +1,7 @@
 using Depth;
 using System.Timers;
 
-class FramerateCounter : Script
+class FPSCounter : Script
 {
     uint frames = 0;
 

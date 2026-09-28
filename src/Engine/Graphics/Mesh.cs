@@ -16,10 +16,9 @@ public class Mesh
         public Matrix4x4 WorldMatrix;
         public VertexArray VAO;
         public Mesh mesh;
-        
     }
 
-    private static List<object> objects = new List<object>();
+    private static List<Mesh> objects = new List<Mesh>();
 
     public VertexArray vao;
     public Program shader;
@@ -34,7 +33,6 @@ public class Mesh
         objects.Add(this);
     }
 
-    
     public unsafe void ProcessBuffer()
     {
         buffer = gl.GenBuffers(1);
@@ -52,17 +50,17 @@ public class Mesh
         {
             instances[i].VAO.Bind();
 
-            gl.EnableVertexAttribArray(2);
+            gl.EnableVertexAttribArray(3);
             for (uint j = 0; j < 4; j++)
             {
-                gl.EnableVertexAttribArray(j+2);
-                gl.VertexAttribPointer(j+2, 4, GLEnum.Float, false, (uint)sizeof(Matrix4x4), (void*) (j * sizeof(Vector4)));
+                gl.EnableVertexAttribArray(j+3);
+                gl.VertexAttribPointer(j+3, 4, GLEnum.Float, false, (uint)sizeof(Matrix4x4), (void*) (j * sizeof(Vector4)));
             }
 
-            gl.VertexAttribDivisor(2, 1);
             gl.VertexAttribDivisor(3, 1);
             gl.VertexAttribDivisor(4, 1);
             gl.VertexAttribDivisor(5, 1);
+            gl.VertexAttribDivisor(6, 1);
 
             gl.BindVertexArray(0);
         }
@@ -92,7 +90,7 @@ public class Mesh
 
         gl.DrawElementsInstanced(
             GLEnum.Triangles, 
-            (uint)instances[0].VAO.indices.Length, 
+            (uint)instances[0].VAO.EBO.data.Length, 
             GLEnum.UnsignedInt, 
             (void*)0, 
             (uint)instances.Count

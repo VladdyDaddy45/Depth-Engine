@@ -10,8 +10,8 @@ public class BufferObject<T>
     private static GL gl = Video.gl;
 
     private uint buffer;
-    private T[] data;
-    private BufferTargetARB target;
+    public T[] data;
+    public BufferTargetARB target;
 
     public unsafe BufferObject(T[] Data, BufferTargetARB Target)
     {
@@ -39,4 +39,14 @@ public class BufferObject<T>
 
     public void Unbind()
     { gl.BindBuffer(target, 0); }
+
+    public void Print()
+    {
+        for (int i = 0; i < data.Length; i++)
+        {
+            Console.Write(data[i] + " ");
+        }
+
+        Console.WriteLine();
+    }
 }

@@ -3,6 +3,16 @@ using Depth.Graphics;
 
 namespace Depth.Parsing;
 
+struct VERT
+{
+    public static readonly uint stride = 3;
+}
+
+struct INDEX
+{
+    public static readonly uint stride = 3;
+}
+
 public static class ModelParser
 {
     public static VertexArray ParseObj(string path)
@@ -56,10 +66,9 @@ public static class ModelParser
             }
         }
 
-        VertexArray vao = new VertexArray(verts.ToArray(), 6);
-        vao.SetIndices(inds.ToArray());
-        vao.SetAttribute(0, 3, VertAttribType.Float);
-        vao.SetAttribute(1, 3, VertAttribType.Float);
+        var vao = new VertexArray(verts.ToArray(), inds.ToArray(), VERT.stride + INDEX.stride);
+        vao.AttribPointer(0, 3, VertAttribType.Float);
+        vao.AttribPointer(1, 3, VertAttribType.Float);
 
         return vao;
     }

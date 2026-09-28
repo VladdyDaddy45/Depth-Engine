@@ -88,6 +88,8 @@ public class Input
     private static void KeyDown(IKeyboard keyboard, Key key, int code)
     {
         int idx = (int)key;
+        if (idx > Buttons.Length-1 || idx > KeyDownEvents.Length-1) return; // make sure user can't press an unregistered button
+
         Buttons[idx] = true;
         for (int i = 0; i < KeyDownEvents[idx].Count; i++)
             KeyDownEvents[idx][i]();
@@ -96,6 +98,8 @@ public class Input
     private static void KeyUp(IKeyboard keyboard, Key key, int code)
     {
         int idx = (int)key;
+        if (idx >= Buttons.Length || idx >= KeyDownEvents.Length) return; // make sure user can't press an unregistered button
+
         Buttons[idx] = false;
         for (int i = 0; i < KeyUpEvents[idx].Count; i++)
             KeyUpEvents[idx][i]();

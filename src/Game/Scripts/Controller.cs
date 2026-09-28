@@ -4,11 +4,11 @@ using Depth;
 using Depth.Graphics;
 using Utils.CMath;
 
-class Player : Script
+class Controller : Script
 {
     Camera camera = new Camera(new Transform(),120f);
     float sensitivity = 0.4f;
-    float movespeed = 5f;
+    float movespeed = 15f;
 
     void Init(string[] args)
     {
@@ -21,7 +21,7 @@ class Player : Script
     void Render(double delta)
     {
         float felta = (float)delta;
-        movespeed = GetKey(Key.ShiftLeft)? 30f : 5f;
+        movespeed = GetKey(Key.ShiftLeft)? 30f : 15f;
 
         if (GetKey(Key.W)) camera.transform.Position +=  camera.transform.Forward * movespeed * felta;
         if (GetKey(Key.S)) camera.transform.Position += -camera.transform.Forward * movespeed * felta;
