@@ -12,6 +12,8 @@ unsafe class Entry
     static Transform transform = new Transform();
     static Mesh thing;
 
+    static readonly bool FORCE_VR = true;
+
     public static void Main(string[] args)
     {
         Application.Init(1200, 800);

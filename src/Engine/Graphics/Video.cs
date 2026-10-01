@@ -2,15 +2,23 @@ namespace Depth.Graphics;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using Depth.VR;
 using Silk.NET.GLFW;
 using Silk.NET.OpenGL;
 using Silk.NET.Vulkan;
+
 
 public class Video
 {
     [NotNull]
     public static GL gl;
     public static List<Action<double>> RenderCallbacks = new List<Action<double>>();
+
+    public enum API
+    {
+        OpenGL,
+        Vulkan,
+    }
     
     public static void Init(Application app)
     {

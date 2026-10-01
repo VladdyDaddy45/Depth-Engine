@@ -44,7 +44,6 @@ public class VertexArray
     {
         Bind();
         VBO.Bind();
-        EBO?.Bind();
 
         gl.EnableVertexAttribArray(Position);
         gl.VertexAttribPointer(
@@ -65,7 +64,6 @@ public class VertexArray
 
         Unbind();
         VBO.Unbind();
-        EBO?.Unbind();
     }
 
     public void Bind()

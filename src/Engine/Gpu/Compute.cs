@@ -28,11 +28,17 @@ public class Compute<ReturnT> where ReturnT : unmanaged
         gl.GetProgram(program, ProgramPropertyARB.LinkStatus, out int pstatus);
         if (pstatus != (int) GLEnum.True)
             throw new Exception("Program failed to link: " + gl.GetProgramInfoLog(program));
-        
     }
 
-    public void Invoke()
+    public void Dispatch(uint length_x, uint length_y, uint length_z)
     {
+        gl.UseProgram(program);
+        gl.DispatchCompute(length_x, length_y, length_z);
+        gl.MemoryBarrier(MemoryBarrierMask.AllBarrierBits);
         
+        
+
+        gl.MemoryBarrier(MemoryBarrierMask.None);
+        gl.UseProgram(0);
     }
 }

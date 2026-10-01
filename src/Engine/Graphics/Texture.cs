@@ -28,4 +28,9 @@ public class Texture
     public void Apply()
     {
     }
+
+    public void Wrap(VertexArray vertarr)
+    {
+        
+    }
 }
