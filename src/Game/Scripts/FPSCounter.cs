@@ -1,13 +1,14 @@
 using Depth;
 using System.Timers;
+using System.Diagnostics;
 
 class FPSCounter : Script
 {
     uint frames = 0;
+    static Stopwatch watch;
 
     void Init()
     {
-        Depth.Graphics.Video.RenderCallbacks.Add(Count);
 
         System.Timers.Timer fpstimer = new System.Timers.Timer();
         fpstimer.Elapsed += new ElapsedEventHandler(CalcFPS);
@@ -15,7 +16,7 @@ class FPSCounter : Script
         fpstimer.Enabled = true;
     }
 
-    void Count(double delta)
+    void Render(double delta)
     {
         frames++;
     }

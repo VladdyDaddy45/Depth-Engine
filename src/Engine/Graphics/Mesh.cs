@@ -1,101 +1,54 @@
-using System.Numerics;
-using Depth.Graphics;
-using Silk.NET.GLFW;
-using Silk.NET.Maths;
 using Silk.NET.OpenGL;
-using Silk.NET.Vulkan;
 
 namespace Depth.Graphics;
 
 public class Mesh
 {
-    private static GL gl = Video.gl;
+    static GL gl = Video.gl;
+    static uint TransformPosition = 4;
 
-    public struct Instance
-    {
-        public Matrix4x4 WorldMatrix;
-        public VertexArray VAO;
-        public Mesh mesh;
-    }
+    private List<float[]> instances = new List<float[]>();
+    public uint MBO; // MatrixBufferObject
 
-    private static List<Mesh> objects = new List<Mesh>();
-
-    public VertexArray vao;
-    public Program shader;
-    public uint buffer;
-
-    private List<Instance> instances = new List<Instance>();
-
-
-    public Mesh(VertexArray VAO)
-    {
-        vao = VAO;
-        objects.Add(this);
-    }
-
-    public unsafe void ProcessBuffer()
-    {
-        buffer = gl.GenBuffers(1);
-        gl.BindBuffer(GLEnum.ArrayBuffer, buffer);
-        Matrix4x4[] matrices = new Matrix4x4[instances.Count];
-
-        for (int i = 0; i < instances.Count; i++)
-            matrices[i] = instances[i].WorldMatrix;
-        
-        fixed (Matrix4x4* transforms = matrices)
-            gl.BufferData(GLEnum.ArrayBuffer, (uint)instances.Count * (uint)sizeof(Matrix4x4), &transforms[0], GLEnum.DynamicDraw);
-        
-
-        for (int i = 0; i < instances.Count; i++)
-        {
-            instances[i].VAO.Bind();
-
-            gl.EnableVertexAttribArray(3);
-            for (uint j = 0; j < 4; j++)
-            {
-                gl.EnableVertexAttribArray(j+3);
-                gl.VertexAttribPointer(j+3, 4, GLEnum.Float, false, (uint)sizeof(Matrix4x4), (void*) (j * sizeof(Vector4)));
-            }
-
-            gl.VertexAttribDivisor(3, 1);
-            gl.VertexAttribDivisor(4, 1);
-            gl.VertexAttribDivisor(5, 1);
-            gl.VertexAttribDivisor(6, 1);
-
-            gl.BindVertexArray(0);
-        }
-    }
+    public VertexArray<float, uint> vao;
     
-    public Instance NewInstance(Transform transform)
-    {
-        Instance instance;
-        
-        instance.WorldMatrix = transform.World;
-        instance.VAO = vao;
-        instance.mesh = this;
 
-        instance.VAO.Bind();
-        
-        instances.Add(instance);
-
-        return instance;
-    }
+    public Mesh(VertexArray<float, uint> VAO)
+    { vao = VAO; }
     
-    public void RemoveInstance(Instance instance)
-    { instances.Remove(instance); }
+    public void PushInstance(Transform transform)
+    { instances.Add(Transform.ToFloatArr(transform)); }
 
     public unsafe void Draw()
     {
-        instances[0].VAO.Bind();
+        Process(); 
+        vao.Bind();
 
-        gl.DrawElementsInstanced(
-            GLEnum.Triangles, 
-            (uint)instances[0].VAO.EBO.data.Length, 
-            GLEnum.UnsignedInt, 
-            (void*)0, 
-            (uint)instances.Count
-        );
+        gl.DrawElementsInstanced(GLEnum.Triangles, (uint)vao.EBO.data.Length, GLEnum.UnsignedInt, (void*)0, (uint)instances.Count);
+        
+        gl.DeleteBuffer(MBO);
+        instances.Clear();
+    }
 
-        gl.BindVertexArray(0);
+
+    public unsafe void Process()
+    {
+        MBO = gl.GenBuffers(1);
+        gl.BindBuffer(GLEnum.ArrayBuffer, MBO);
+        var matrices = new List<float>(16*instances.Count);
+
+        for (int i = 0; i < instances.Count; i++)
+            matrices.AddRange(instances[i]);
+        
+        vao.Bind();
+        fixed (float* transforms = matrices.ToArray())
+            gl.BufferData(GLEnum.ArrayBuffer, (uint)instances.Count * 16u * sizeof(float), &transforms[0], GLEnum.DynamicDraw);
+        
+        for (uint i = 0; i < 4; i++)
+        {
+            gl.EnableVertexAttribArray(TransformPosition+i);
+            gl.VertexAttribPointer(TransformPosition+i, 4, GLEnum.Float, false, 16 * sizeof(float), (void*)(sizeof(float) * 4 * i));
+            gl.VertexAttribDivisor(TransformPosition+i, 1);
+        }
     }
 }

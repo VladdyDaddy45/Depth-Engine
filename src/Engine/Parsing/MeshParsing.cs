@@ -1,11 +1,10 @@
-using Depth.Graphics;
 using Silk.NET.Assimp;
 using System.Numerics;
 using AssimpMesh = Silk.NET.Assimp.Mesh;
 using Texture = Silk.NET.Assimp.Texture;
 using Mesh = Depth.Graphics.Mesh;
 
-namespace Depth.Parsing;
+namespace Parsing;
 
 struct Vertex
 {
@@ -26,30 +25,29 @@ struct Vertex
     }
 }
 
-public class Obj
+public partial class Importer
 {
-    
-    public static Model model;
-
     static Assimp assimp = Assimp.GetApi();
     public static List<Mesh> meshes = new List<Mesh>();
 
-    public static unsafe void Load(string path)
+    public static unsafe Mesh LoadMesh(string path)
     {
         var scene = assimp.ImportFile(path, (uint)PostProcessSteps.Triangulate);
 
         if (scene == null || scene->MFlags == Assimp.SceneFlagsIncomplete || scene -> MRootNode == null)
             throw new Exception(assimp.GetErrorStringS());
 
-        Console.WriteLine();
         ProcessNode(scene->MRootNode, scene);
+        Mesh result = meshes[0];
+        meshes.Clear();
+
+        return result;
     }
 
     static unsafe void ProcessNode(Node* node, Scene* scene)
     {
         for (int i = 0; i < node->MNumMeshes; i++)
         {
-            Console.WriteLine("!! ADDING MESH !!");
             var mesh = scene->MMeshes[node->MMeshes[i]];
             meshes.Add(ProcessMesh(mesh, scene));
         }
@@ -100,10 +98,16 @@ public class Obj
         }
 
         // TODO: Add texture loading
-        var VAO = new VertexArray(BuildVerts(vertices), indices.ToArray(), 9);
-        VAO.AttribPointer(0, 3, VertAttribType.Float);
-        VAO.AttribPointer(1, 3, VertAttribType.Float);
-        VAO.AttribPointer(2, 3, VertAttribType.Float);
+        var VAO = new Depth.Graphics.VertexArray<float, uint>(
+            new Depth.Graphics.BufferObject<float>(BuildVerts(vertices),BufferTargetARB.ArrayBuffer), // VBO
+            new Depth.Graphics.BufferObject<uint>(indices.ToArray(),BufferTargetARB.ElementArrayBuffer)
+        );
+        
+        VAO.AddAttribute(0, 3, VertAttribType.Float); // position
+        VAO.AddAttribute(1, 3, VertAttribType.Float); // normal
+        VAO.AddAttribute(2, 3, VertAttribType.Float); // color
+        VAO.AddAttribute(3, 2, VertAttribType.Float); // texcoords
+        VAO.CompileAttributes();
         return new Mesh(VAO);
     }
 
@@ -119,11 +123,9 @@ public class Obj
             result.Add(vertices[i].Norm.X);
             result.Add(vertices[i].Norm.Y);
             result.Add(vertices[i].Norm.Z);
-            result.AddRange([
-                (float)new Random().NextDouble(),
-                (float)new Random().NextDouble(),
-                (float)new Random().NextDouble()
-            ]);
+            result.AddRange([.5f,.5f,.5f]);
+            result.Add(vertices[i].TexCoords.X);
+            result.Add(vertices[i].TexCoords.Y);
         }
 
         return result.ToArray();

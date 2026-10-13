@@ -4,66 +4,89 @@ using Silk.NET.OpenGL;
 
 namespace Depth.Graphics;
 
-public struct VertAttrib
+
+public struct VertexAttribute
 {
-    public uint Position;
-    public uint Size;
-    public VertAttribType Type;
+    public uint index;
+    public uint count;
+    public VertAttribType type;
 };
 
-public class VertexArray
+public class VertexArray<VertType, IndexType>
+    where VertType : unmanaged
+    where IndexType: unmanaged
 {
     private static GL gl = Video.gl;
 
     public uint handle;
-    public uint stride;
-    public VertAttrib[] attributes = new VertAttrib[1];
-    public int attribNumber = 0;
+    public List<VertexAttribute> attributes = new List<VertexAttribute>();
 
-    public BufferObject<float> VBO;
-    public BufferObject<uint> EBO;
+    public BufferObject<VertType> VBO;
+    public BufferObject<IndexType> EBO;
 
-    public VertexArray(float[] data, uint[] inds, uint Stride)
+    public VertexArray(BufferObject<VertType> vbo, BufferObject<IndexType> ebo)
     {
         handle = gl.GenVertexArray();
-        stride = Stride;
-        Bind();
-        VBO = new BufferObject<float>(data, BufferTargetARB.ArrayBuffer);
-        EBO = new BufferObject<uint>(inds,BufferTargetARB.ElementArrayBuffer);
-        Unbind();
+        VBO = vbo;
+        EBO = ebo;
+        BufferData();
     }
 
-    public unsafe void Draw()
+    public void AddAttribute(VertexAttribute attrib)
+    { attributes.Add(attrib); } 
+
+    public void AddAttribute(uint Index, uint Count, VertAttribType Type)
+    { attributes.Add( new VertexAttribute {index = Index, count = Count, type = Type} ); } 
+
+    public void CompileAttributes()
+    {
+        foreach (var attrib in attributes)
+            AttribPointer(attrib.index, attrib.count, attrib.type);
+    }
+
+    public unsafe void AttribPointer(uint Index, uint Count, VertAttribType Type)
     {
         Bind();
-        gl.DrawElements(PrimitiveType.Triangles, (uint)EBO.data.Length, DrawElementsType.UnsignedInt, (void*) 0);
+
+        gl.EnableVertexAttribArray(Index);
+
+        gl.VertexAttribPointer(
+            Index, (int)Count, Type, false,
+            CalcStride() * (uint)sizeof(VertType),
+            (void*)(CalcOffset(Index) * sizeof(VertType))
+        );
+
         Unbind();
     }
 
-    public unsafe void AttribPointer(uint Position, uint Size, VertAttribType Type)
+    public uint CalcStride()
+    {
+        uint result = 0;
+
+        foreach (var attrib in attributes) 
+            result += attrib.count;
+
+        //Console.WriteLine(result);
+        return result;
+    }
+
+    public uint CalcOffset(uint Index)
+    {
+        uint result = 0;
+        if (Index == 0) return 0;
+
+        for (int i = 0; i < Index; i++)
+            result += attributes[i].count;
+        
+        return result;
+    }
+
+    public void BufferData()
     {
         Bind();
         VBO.Bind();
-
-        gl.EnableVertexAttribArray(Position);
-        gl.VertexAttribPointer(
-            Position, 
-            (int)Size, 
-            Type,
-            false,
-            stride * sizeof(float), 
-            (void*) (0 + (Position * Size * sizeof(float)))
-        );
-
-        AddAttribute(
-        new VertAttrib {
-            Position = Position,
-            Size = Size,
-            Type = Type
-        });
-
+        EBO.Bind();
         Unbind();
-        VBO.Unbind();
     }
 
     public void Bind()
@@ -72,15 +95,6 @@ public class VertexArray
     public void Unbind()
     { gl.BindVertexArray(0); }
 
-    private void AddAttribute(VertAttrib attrib)
-    {
-        attribNumber++;
-        VertAttrib[] temp = new VertAttrib[attribNumber];
-
-        for (int i = 0; i < attributes.Length; i++) 
-            temp[i] = attributes[i];
-
-        temp[attribNumber-1] = attrib;
-        attributes = temp;
-    }
+    public void Dispose()
+    { gl.DeleteVertexArray(handle); }
 }

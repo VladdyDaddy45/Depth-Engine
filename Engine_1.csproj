@@ -15,6 +15,7 @@
     <None Update="assets/**/*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <PackageReference Include="SkiaSharp" Version="4.153.1" />
   </ItemGroup>
 
 </Project>

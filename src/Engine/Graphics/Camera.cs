@@ -9,8 +9,7 @@ namespace Depth.Graphics;
 
 public class Camera
 {
-    [NotNull]
-    public static Camera? CurrentCamera;
+    public static Camera CurrentCamera;
 
     private static GL gl = Video.gl;
     private static float width => (float)Application.MainApp.width;
@@ -38,12 +37,7 @@ public class Camera
         if (CurrentCamera == null)
             setAsCurrent();
     }
-
-    public void Draw()
-    {
-        
-    }
-
+    
     public void setAsCurrent()
     {
         CurrentCamera = this;

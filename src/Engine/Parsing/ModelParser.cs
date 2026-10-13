@@ -12,7 +12,7 @@ struct INDEX
 {
     public static readonly uint stride = 3;
 }
-
+/*
 public static class ModelParser
 {
     public static VertexArray ParseObj(string path)
@@ -73,3 +73,4 @@ public static class ModelParser
         return vao;
     }
 }
+*/

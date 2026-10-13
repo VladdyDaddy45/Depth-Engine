@@ -7,25 +7,27 @@ using Utils;
 namespace Depth.Graphics.Shaders;
 
 
-// Class for shader programs
+// Class for shader handles
 public unsafe class ShaderProgram
 {
     private static GL gl = Video.gl;
     private static List<ShaderProgram> Objects = new List<ShaderProgram>();
 
-    public uint program;
+    public static ShaderProgram? ActiveProgram = null;
+
+    public uint handle;
     public bool linked = false;
 
     public ShaderProgram() 
     {
-        program = gl.CreateProgram();
+        handle = gl.CreateProgram();
         Objects.Add(this);
     }
 
     // Will attach every shader provided in the array
     public ShaderProgram(Shader[] shaders)
     {
-        program = gl.CreateProgram();
+        handle = gl.CreateProgram();
         foreach (Shader shader in shaders)
             Attach(shader); 
 
@@ -35,13 +37,20 @@ public unsafe class ShaderProgram
 
     public void Use()
     {
-        gl.UseProgram(program);
+        gl.UseProgram(handle);
+        ActiveProgram = this;
+    }
+
+    public static void Clear()
+    {
+        gl.UseProgram(0);
+        ActiveProgram = null;
     }
     
     public int GetUniformName(string name)
     {
-        gl.UseProgram(program);
-        int location = gl.GetUniformLocation(program, name);
+        gl.UseProgram(handle);
+        int location = gl.GetUniformLocation(handle, name);
         if (location == -1)
             throw new Exception($"Uniform {name} not found in ShaderProgram");
 
@@ -74,30 +83,30 @@ public unsafe class ShaderProgram
 
     public void Link()
     {
-        gl.LinkProgram(program);
-        gl.GetProgram(program, ProgramPropertyARB.LinkStatus, out int status);
+        gl.LinkProgram(handle);
+        gl.GetProgram(handle, ProgramPropertyARB.LinkStatus, out int status);
         if (status != (int) GLEnum.True)
-            throw new Exception("Program failed to link: " + gl.GetProgramInfoLog(program));
+            throw new Exception("Program failed to link: " + gl.GetProgramInfoLog(handle));
         
         linked = true;
     }
 
     public void Attach(Shader shader)
-    { gl.AttachShader(program,shader.shader); }
+    { gl.AttachShader(handle,shader.shader); }
 
     public void Detach(Shader shader)
-    { gl.DetachShader(program, shader.shader); }
+    { gl.DetachShader(handle, shader.shader); }
 
     public void Kill()
     {
-        gl.DeleteProgram(program);
+        gl.DeleteProgram(handle);
         Objects.Remove(this);
     }
 
     // minor method overloading for this, don't get rid of this argument.
     private void Kill(bool isGenocide)
     {
-        gl.DeleteProgram(program);
+        gl.DeleteProgram(handle);
     }
 
     // NO. TOUCH.

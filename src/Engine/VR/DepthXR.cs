@@ -6,6 +6,7 @@ namespace Depth.VR;
 
 
 // hell.
+/*
 public class DepthXR
 {
     Instance xrInstance = new Instance();
@@ -45,3 +46,4 @@ public class DepthXR
     private void GetSystemID() {}
     private void PollSystemEvents() {}
 }
+*/

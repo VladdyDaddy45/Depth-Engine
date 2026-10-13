@@ -9,44 +9,36 @@ public class BufferObject<T>
 {
     private static GL gl = Video.gl;
 
-    private uint buffer;
+    public BufferTargetARB bufferType;
+
+    private uint handle;
     public T[] data;
-    public BufferTargetARB target;
 
     public unsafe BufferObject(T[] Data, BufferTargetARB Target)
     {
-        buffer = gl.GenBuffer();
+        handle = gl.GenBuffer();
         data = Data;
-        target = Target;
+        bufferType = Target;
 
-        gl.BindBuffer(target, buffer);
+        gl.BindBuffer(bufferType, handle);
 
         fixed (T* buf = data)
-        {
             gl.BufferData(
-                target, 
+                bufferType, 
                 (nuint) (data.Length * sizeof(T)),
                 buf,
                 BufferUsageARB.DynamicDraw
             );
-        }
+        
     }
 
     public void Bind()
-    {
-        gl.BindBuffer(target, buffer);
-    }
+    { gl.BindBuffer(bufferType, handle); }
 
     public void Unbind()
-    { gl.BindBuffer(target, 0); }
+    { gl.BindBuffer(BufferTargetARB.ArrayBuffer, 0); }
 
-    public void Print()
-    {
-        for (int i = 0; i < data.Length; i++)
-        {
-            Console.Write(data[i] + " ");
-        }
+    public void Dispose()
+    { gl.DeleteBuffer(handle); }
 
-        Console.WriteLine();
-    }
 }

@@ -26,6 +26,9 @@ public class Video
         gl.ClearColor(Color.CornflowerBlue);
         gl.Enable(GLEnum.DepthTest);
         gl.DepthFunc(GLEnum.Less);
+
+        gl.Enable(EnableCap.Blend);
+        gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         
         gl.Enable(GLEnum.Multisample);
         gl.Enable(GLEnum.CullFace);
