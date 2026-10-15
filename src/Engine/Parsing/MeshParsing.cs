@@ -105,8 +105,7 @@ public partial class Importer
         
         VAO.AddAttribute(0, 3, VertAttribType.Float); // position
         VAO.AddAttribute(1, 3, VertAttribType.Float); // normal
-        VAO.AddAttribute(2, 3, VertAttribType.Float); // color
-        VAO.AddAttribute(3, 2, VertAttribType.Float); // texcoords
+        VAO.AddAttribute(2, 2, VertAttribType.Float); // texcoords
         VAO.CompileAttributes();
         return new Mesh(VAO);
     }
@@ -123,7 +122,6 @@ public partial class Importer
             result.Add(vertices[i].Norm.X);
             result.Add(vertices[i].Norm.Y);
             result.Add(vertices[i].Norm.Z);
-            result.AddRange([.5f,.5f,.5f]);
             result.Add(vertices[i].TexCoords.X);
             result.Add(vertices[i].TexCoords.Y);
         }

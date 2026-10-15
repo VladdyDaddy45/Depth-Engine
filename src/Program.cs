@@ -36,10 +36,11 @@ class Entry
         thing = Parsing.Importer.LoadMesh("assets/models/sphere.obj");
         scene.AddMesh(thing);
 
+        texture = new Texture("assets/textures/mark.jpg", "uTexture",TexUnit.Texture0);
         Shader vert = new Shader("vertex/projection.vs");
         Shader frag = new Shader("fragment/simple.frag");
+        Shader geom = new Shader("geometry/test.geom");
         program = new ShaderProgram([vert, frag]);
-        texture = new Texture("assets/textures/mustard.png", "uTexture",TexUnit.Texture0);
 
         AddDownCallback(Key.K, ToggleWireframe);
 
@@ -63,8 +64,8 @@ class Entry
         program.Uniform("proj",Camera.CurrentCamera.proj);
         program.Uniform("view",Camera.CurrentCamera.view);
 
-        //program.Uniform("LightDirection", new Vector3(tsin, 1, 0));
-        //program.Uniform("AmbientLight", .01f);
+        program.Uniform("LightDirection", new Vector3(tsin, 1, 0));
+        program.Uniform("AmbientLight", .01f);
 
         scene.Draw();
     }

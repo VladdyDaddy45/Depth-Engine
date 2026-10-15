@@ -1,4 +1,5 @@
-using System.Numerics;
+using System.Diagnostics;
+using System.Timers;
 using Depth.Graphics;
 
 namespace Depth;
@@ -13,8 +14,15 @@ public class Scene
 {
     public static Scene mainScene;
 
-    private List<Instance> instances;
-    private List<Mesh> meshes;
+    public List<Instance> instances;
+    public List<Mesh> meshes;
+
+    static Stopwatch CpuStopwatch = new();
+    static Stopwatch GpuStopwatch = new();
+    static double gpuTime = 0.0;
+    static double cpuTime = 0.0;
+    static int frames = 0;
+
 
     public Scene()
     { 
@@ -22,14 +30,33 @@ public class Scene
         meshes = new List<Mesh>();
 
         mainScene = this;
+
+        System.Timers.Timer fpstimer = new System.Timers.Timer();
+        fpstimer.Elapsed += new ElapsedEventHandler(CalcFrameTime);
+        fpstimer.Interval = 1000;
+        fpstimer.Enabled = true;
     }
 
     public void Draw()
     {
         foreach (Instance inst in instances) 
             meshes[inst.MeshID].PushInstance(inst.transform);
+
+        CpuStopwatch.Stop();
+        cpuTime += CpuStopwatch.ElapsedMilliseconds;
+        CpuStopwatch.Reset();
+
+        GpuStopwatch.Start();
+
         foreach (Mesh mesh in meshes)
             mesh.Draw();
+        
+        GpuStopwatch.Stop();
+        gpuTime += GpuStopwatch.ElapsedMilliseconds;
+        GpuStopwatch.Reset();
+
+        CpuStopwatch.Start();
+        frames++;
     }
 
     public void AddInstance(Transform transform, Mesh mesh)
@@ -49,4 +76,13 @@ public class Scene
 
     public int FindMesh(Mesh mesh)
     { return meshes.IndexOf(mesh); }
+
+
+    private void CalcFrameTime(object? source, ElapsedEventArgs? e)
+    {
+        Console.WriteLine($"CPU avg: {Math.Round(cpuTime/frames,5)}ms \t\tGPU avg: {Math.Round(gpuTime/frames,5)}ms");
+        frames = 0;
+        cpuTime = 0;
+        gpuTime = 0;
+    }
 }

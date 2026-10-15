@@ -12,8 +12,9 @@ public unsafe class ShaderProgram
 {
     private static GL gl = Video.gl;
     private static List<ShaderProgram> Objects = new List<ShaderProgram>();
+    private static List<string> warnings = new List<string>();
 
-    public static ShaderProgram? ActiveProgram = null;
+    public static ShaderProgram ActiveProgram = null;
 
     public uint handle;
     public bool linked = false;
@@ -51,8 +52,10 @@ public unsafe class ShaderProgram
     {
         gl.UseProgram(handle);
         int location = gl.GetUniformLocation(handle, name);
-        if (location == -1)
-            throw new Exception($"Uniform {name} not found in ShaderProgram");
+        if (location == -1 && warnings.IndexOf(name) == -1) {
+            warnings.Add(name);
+            Console.WriteLine($"Uniform {name} not found in ShaderProgram");
+        }
 
         return location;
     }
@@ -105,9 +108,7 @@ public unsafe class ShaderProgram
 
     // minor method overloading for this, don't get rid of this argument.
     private void Kill(bool isGenocide)
-    {
-        gl.DeleteProgram(handle);
-    }
+    { gl.DeleteProgram(handle); }
 
     // NO. TOUCH.
     public static void Cleanup()

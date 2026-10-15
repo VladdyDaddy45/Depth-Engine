@@ -5,13 +5,12 @@ namespace Depth.Graphics;
 public class Mesh
 {
     static GL gl = Video.gl;
-    static uint TransformPosition = 4;
+    static readonly uint TransformPosition = 3;
 
     private List<float[]> instances = new List<float[]>();
-    public uint MBO; // MatrixBufferObject
+    public uint mbo; // MatrixBufferObject
 
     public VertexArray<float, uint> vao;
-    
 
     public Mesh(VertexArray<float, uint> VAO)
     { vao = VAO; }
@@ -26,15 +25,15 @@ public class Mesh
 
         gl.DrawElementsInstanced(GLEnum.Triangles, (uint)vao.EBO.data.Length, GLEnum.UnsignedInt, (void*)0, (uint)instances.Count);
         
-        gl.DeleteBuffer(MBO);
+        gl.DeleteBuffer(mbo);
         instances.Clear();
     }
 
 
     public unsafe void Process()
     {
-        MBO = gl.GenBuffers(1);
-        gl.BindBuffer(GLEnum.ArrayBuffer, MBO);
+        mbo = gl.GenBuffers(1);
+        gl.BindBuffer(GLEnum.ArrayBuffer, mbo);
         var matrices = new List<float>(16*instances.Count);
 
         for (int i = 0; i < instances.Count; i++)
